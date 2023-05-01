@@ -1,6 +1,10 @@
 package net.llevasse.fantasbee;
 
 import com.mojang.logging.LogUtils;
+
+import net.llevasse.fantasbee.block.ModBlocks;
+import net.llevasse.fantasbee.item.ModCreativeModeTabs;
+import net.llevasse.fantasbee.item.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -25,15 +29,17 @@ import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod(FantasBee.MODID)
+@Mod(FantasBee.MOD_ID)
 public class FantasBee
 {
-    public static final String MODID = "fantasbee";
-    // Directly reference a slf4j logger
+    public static final String MOD_ID = "fantasbee";
     private static final Logger LOGGER = LogUtils.getLogger();
     public FantasBee()
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
@@ -47,11 +53,15 @@ public class FantasBee
 
     private void addCreative(CreativeModeTabEvent.BuildContents event)
     {
+        if (event.getTab() == ModCreativeModeTabs.FANTASBEE_TAB){
+            event.accept(ModItems.SUSPECIOUS_BEEHIVE);
+            event.accept(ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK);
+        }
      }
 
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents
     {
         @SubscribeEvent
