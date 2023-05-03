@@ -1,12 +1,8 @@
 {
-	"default": {
-		"": { "model": "fantasbee:block/suspecious_beehive_block_north"}
-	},
 	"variants": {
-		"":	{ "model": "fantasbee:block/suspecious_beehive_block_north"},
-		"direction=north":	{ "model": "fantasbee:block/suspecious_beehive_block_north"},
-		"direction=south":	{ "model": "fantasbee:block/suspecious_beehive_block_south"},
-		"direction=west":	{ "model": "fantasbee:block/suspecious_beehive_block_west"},
-		"direction=east":	{ "model": "fantasbee:block/suspecious_beehive_block_east"}
+		"facing=north":	{ "model": "fantasbee:block/suspecious_beehive_block"},
+		"facing=south":	{ "model": "fantasbee:block/suspecious_beehive_block", "y": 180},
+		"facing=west":	{ "model": "fantasbee:block/suspecious_beehive_block", "y" : 270},
+		"facing=east":	{ "model": "fantasbee:block/suspecious_beehive_block", "y" : 90}
 	}
 } 
