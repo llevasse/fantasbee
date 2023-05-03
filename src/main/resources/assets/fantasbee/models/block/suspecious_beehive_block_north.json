@@ -1,0 +1,8 @@
+{
+	"parent": "block/orientable",
+	"textures": {
+		"top": "fantasbee:block/beehive_end_placeholder",
+		"front": "fantasbee:block/beehive_front_placeholder",
+		"side": "fantasbee:block/beehive_side_placeholder"
+	}
+}
