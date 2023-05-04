@@ -3,6 +3,7 @@ package net.llevasse.fantasbee.block;
 import com.google.common.base.Supplier;
 
 import net.llevasse.fantasbee.FantasBee;
+import net.llevasse.fantasbee.block.custom.suspecious_beehive_block;
 import net.llevasse.fantasbee.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -19,7 +20,7 @@ public class ModBlocks {
 			FantasBee.MOD_ID);
 
 	public static final RegistryObject<Block> SUSPECISOUS_BEEHIVE_BLOCK = registerBlock("suspecious_beehive_block", 
-	() -> new Block(BlockBehaviour.Properties.copy(Blocks.BEEHIVE)));
+	() -> new suspecious_beehive_block(BlockBehaviour.Properties.copy(Blocks.BEEHIVE)));
 
 	private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
 		RegistryObject<T> toReturn = BLOCKS.register(name, block);
