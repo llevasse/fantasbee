@@ -6,7 +6,7 @@
 		"entries": [
 		{
 			"type": "minecraft:item",
-			"name": "fantasbee:suspecious_beehive_block"
+			"name": "fantasbee:dead_suspecious_beehive_block"
 		}
 		]
 	}

@@ -1,8 +1,0 @@
-{
-	"variants": {
-		"facing=north":	{ "model": "fantasbee:block/suspecious_beehive_block"},
-		"facing=south":	{ "model": "fantasbee:block/suspecious_beehive_block", "y": 180},
-		"facing=west":	{ "model": "fantasbee:block/suspecious_beehive_block", "y" : 270},
-		"facing=east":	{ "model": "fantasbee:block/suspecious_beehive_block", "y" : 90}
-	}
-} 

@@ -1,5 +1,5 @@
 {
-	"item.fantasbee.suspecious_beehive" : "Suspecious Beehive",
-	"block.fantasbee.suspecious_beehive_block": "Suspecious Beehive Block",
+	"item.fantasbee.dead_suspecious_beehive" : "Suspecious Beehive",
+	"block.fantasbee.dead_suspecious_beehive_block": "Dead Suspecious Beehive Block",
 	"creativemodetab.fantasbee_tab" : "Fantasbee Tab"
 }
