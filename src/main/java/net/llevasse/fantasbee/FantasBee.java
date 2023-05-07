@@ -42,8 +42,8 @@ public class FantasBee
     private void addCreative(CreativeModeTabEvent.BuildContents event)
     {
         if (event.getTab() == ModCreativeModeTabs.FANTASBEE_TAB){
-            event.accept(ModItems.SUSPECIOUS_BEEHIVE);
             event.accept(ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK);
+            event.accept(ModBlocks.DEAD_SUSPECISOUS_BEEHIVE_BLOCK);
         }
      }
 
