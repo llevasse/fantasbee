@@ -1,8 +1,19 @@
 package net.llevasse.fantasbee.block.custom;
 
-public class suspecious_beehive_block extends base_orientable_block{
+import net.llevasse.fantasbee.entities.block_entities.BlockEntities;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+public class suspecious_beehive_block extends base_orientable_block implements EntityBlock{
 	public suspecious_beehive_block(Properties properties){
 		super(properties);
+	}
+
+	@Override
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return BlockEntities.MYSTERIOUS_BEEHIVE_BLOCK_ENTITY.get().create(pos, state);
 	}
 }
 
