@@ -3,6 +3,7 @@ package net.llevasse.fantasbee;
 import com.mojang.logging.LogUtils;
 
 import net.llevasse.fantasbee.block.ModBlocks;
+import net.llevasse.fantasbee.entities.ModEntities;
 import net.llevasse.fantasbee.entities.block_entities.BlockEntities;
 import net.llevasse.fantasbee.item.ModCreativeModeTabs;
 import net.llevasse.fantasbee.item.ModItems;
@@ -30,6 +31,7 @@ public class FantasBee
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         BlockEntities.register(modEventBus);
+        ModEntities.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
