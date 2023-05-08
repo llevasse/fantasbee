@@ -8,15 +8,13 @@ import net.minecraft.world.level.Level;
 
 public class MysteriousBees extends Bee {
 
-	public MysteriousBees(EntityType<? extends Bee> p_27717_, Level p_27718_) {
-		super(p_27717_, p_27718_);
-		//TODO Auto-generated constructor stub
+	public MysteriousBees(EntityType<? extends Bee> Entity, Level lvl) {
+		super(Entity, lvl);
 	}
 	
 	@Override
-	public Bee getBreedOffspring(ServerLevel p_148760_, AgeableMob p_148761_) {
-		// TODO Auto-generated method stub
-		return super.getBreedOffspring(p_148760_, p_148761_);
+	public Bee getBreedOffspring(ServerLevel lvl, AgeableMob mob) {
+		return super.getBreedOffspring(lvl, mob);
 	}
 	
 	
