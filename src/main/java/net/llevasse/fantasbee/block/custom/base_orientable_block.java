@@ -16,6 +16,7 @@ public class base_orientable_block extends Block{
 		super(properties);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
 		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
