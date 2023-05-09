@@ -2,5 +2,6 @@
 	"item.fantasbee.dead_suspecious_beehive" : "Suspecious Beehive",
 	"block.fantasbee.dead_suspecious_beehive_block": "Dead Suspecious Beehive Block",
 	"block.fantasbee.suspecious_beehive_block": "Suspecious Beehive Block",
+	"entity.fantasbee.mysterious_bee": "Mysterious bee",
 	"creativemodetab.fantasbee_tab" : "Fantasbee Tab"
 }

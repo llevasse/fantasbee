@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class MysteriousBeeModel extends BeeModel<MysteriousBee> {
 
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(FantasBee.MOD_ID, "mysterious_bees"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(FantasBee.MOD_ID, "mysterious_bee"), "main");
 
 	public MysteriousBeeModel(ModelPart ModelP) {
 		super(ModelP);

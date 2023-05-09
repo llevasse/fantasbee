@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientSetup {
 	@SubscribeEvent
 	public static void EntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-		EntityRenderers.register(ModEntities.MYSTERIOUS_BEES.get(), MysteriousBeeRenderer::new);
+		EntityRenderers.register(ModEntities.MYSTERIOUS_BEE.get(), MysteriousBeeRenderer::new);
 	}
 	
 	@SubscribeEvent

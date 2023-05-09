@@ -15,7 +15,7 @@ public class MysteriousBee extends Bee {
 	
 	@Override
 	public Bee getBreedOffspring(ServerLevel lvl, AgeableMob mob) {
-		return ModEntities.MYSTERIOUS_BEES.get().create(lvl);
+		return ModEntities.MYSTERIOUS_BEE.get().create(lvl);
 	}
 
 	public static AttributeSupplier.Builder getMysteriousBeeAttributes() {
