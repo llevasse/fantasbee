@@ -1,14 +1,13 @@
 package net.llevasse.fantasbee.entities.model;
 
 import net.llevasse.fantasbee.FantasBee;
-import net.llevasse.fantasbee.entities.MysteriousBees;
+import net.llevasse.fantasbee.entities.MysteriousBee;
 import net.minecraft.client.model.BeeModel;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.resources.ResourceLocation;
 
-public class MysteriousBeeModel extends BeeModel<MysteriousBees> {
+public class MysteriousBeeModel extends BeeModel<MysteriousBee> {
 
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(FantasBee.MOD_ID, "mysterious_bees"), "main");
 

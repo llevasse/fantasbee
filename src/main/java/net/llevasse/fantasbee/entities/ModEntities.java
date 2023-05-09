@@ -12,8 +12,8 @@ public class ModEntities {
 	public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES,
 			FantasBee.MOD_ID);
 
-	public static final RegistryObject<EntityType<MysteriousBees>> MYSTERIOUS_BEES = ENTITIES
-			.register("mysterious_bees", () -> EntityType.Builder.of(MysteriousBees::new, MobCategory.CREATURE)
+	public static final RegistryObject<EntityType<MysteriousBee>> MYSTERIOUS_BEES = ENTITIES
+			.register("mysterious_bees", () -> EntityType.Builder.of(MysteriousBee::new, MobCategory.CREATURE)
 					.sized(0.7F, 0.6F).clientTrackingRange(8).build(FantasBee.MOD_ID + ":mysterious_bees"));
 
 	public static void register(IEventBus modEventBus) {
