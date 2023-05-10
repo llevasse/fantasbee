@@ -10,7 +10,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 
 @OnlyIn(Dist.CLIENT)
-public class MysteriousBeeRenderer extends MobRenderer<MysteriousBee, MysteriousBeeModel> {
+public class MysteriousBeeRenderer extends MobRenderer<MysteriousBee, MysteriousBeeModel<MysteriousBee>> {
 	public MysteriousBeeRenderer(Context ctx) {
 		super(ctx, new MysteriousBeeModel(ctx.bakeLayer(MysteriousBeeModel.LAYER_LOCATION)), 0.4f);
 	}
