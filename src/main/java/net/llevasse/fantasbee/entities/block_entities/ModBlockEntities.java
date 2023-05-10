@@ -2,6 +2,8 @@ package net.llevasse.fantasbee.entities.block_entities;
 
 import net.llevasse.fantasbee.FantasBee;
 import net.llevasse.fantasbee.block.ModBlocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
