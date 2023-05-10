@@ -8,18 +8,17 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-public class BlockEntities {
-	// For some DeferredRegister<BlockEntityType<?>> REGISTER
-	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPE = DeferredRegister
+public class ModBlockEntities {
+	public static final DeferredRegister<BlockEntityType<?>> MOD_BLOCK_ENTITY_TYPE = DeferredRegister
 			.create(ForgeRegistries.BLOCK_ENTITY_TYPES, FantasBee.MOD_ID);
 
-	public static final RegistryObject<BlockEntityType<mysterious_beehive_block_entity>> MYSTERIOUS_BEEHIVE_BLOCK_ENTITY = BLOCK_ENTITY_TYPE
+	public static final RegistryObject<BlockEntityType<MysteriousBeehiveBlockEntity>> MYSTERIOUS_BEEHIVE_BLOCK_ENTITY = MOD_BLOCK_ENTITY_TYPE
 			.register("mysterious_beehive_block",
 					() -> BlockEntityType.Builder
-							.of(mysterious_beehive_block_entity::new, ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK.get())
+							.of(MysteriousBeehiveBlockEntity::new, ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK.get())
 							.build(null));
 
 	public static void register(IEventBus modEventBus) {
-		BLOCK_ENTITY_TYPE.register(modEventBus);
+		MOD_BLOCK_ENTITY_TYPE.register(modEventBus);
 	}
 }

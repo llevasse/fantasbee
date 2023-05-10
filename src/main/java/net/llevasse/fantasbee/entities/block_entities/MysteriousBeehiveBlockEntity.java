@@ -4,9 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class mysterious_beehive_block_entity extends BeehiveBlockEntity {
+public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 
-	public mysterious_beehive_block_entity(BlockPos pos, BlockState state) {
+	public MysteriousBeehiveBlockEntity(BlockPos pos, BlockState state) {
   		super(pos, state);
 	}
 }

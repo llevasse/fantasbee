@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 
 import net.llevasse.fantasbee.block.ModBlocks;
 import net.llevasse.fantasbee.entities.ModEntities;
-import net.llevasse.fantasbee.entities.block_entities.BlockEntities;
+import net.llevasse.fantasbee.entities.block_entities.ModBlockEntities;
 import net.llevasse.fantasbee.item.ModCreativeModeTabs;
 import net.llevasse.fantasbee.item.ModItems;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,7 +30,7 @@ public class FantasBee
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
-        BlockEntities.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
         ModEntities.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
