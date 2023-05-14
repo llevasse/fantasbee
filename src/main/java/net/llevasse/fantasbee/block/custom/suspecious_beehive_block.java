@@ -39,9 +39,9 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 	public InteractionResult use(BlockState state, Level lvl, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
 		ItemStack handItem = player.getItemInHand(hand);
-		//int i = state.getValue(LEVEL_HONEY);
+		int i = state.getValue(LEVEL_HONEY);
 		Item item = handItem.getItem();
-		if (item == Items.DIAMOND_AXE){
+		if (item == Items.DIAMOND_AXE && i >= 5){
 			dropProduct(lvl, pos);
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		}

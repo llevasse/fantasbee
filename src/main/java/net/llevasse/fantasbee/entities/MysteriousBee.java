@@ -73,7 +73,9 @@ import net.minecraft.world.entity.ai.util.HoverRandomPos;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -139,6 +141,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 	BlockPos savedFlowerPos;
 	@Nullable
 	BlockPos hivePos;
+	@Nullable
+	Item product;
 	MysteriousBee.MysteriousBeePollinateGoal beePollinateGoal;
 	MysteriousBee.MysteriousBeeGoToHiveGoal goToHiveGoal;
 	private MysteriousBee.MysteriousBeeGoToKnownFlowerGoal goToKnownFlowerGoal;
@@ -162,6 +166,21 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 
 	// need to copy and Override every methods in MysteriousBee.class that use the blocktag
 	// "BEEHIVES"
+	
+	public void SetProductFromFlower(Block block){
+		if (block.equals(Blocks.POPPY)){
+			this.product = Items.RED_DYE;
+			System.out.println("\n\n\n\n\n\n\n\n\nBee choose RED_DYE\n\n\n\n\n\n\n\n\n");
+		}
+		else if (block.equals(Blocks.WITHER_ROSE)){
+			this.product = Items.BLACK_DYE;
+			System.out.println("\n\n\n\n\n\n\n\n\nBee choose BLACK_DYE\n\n\n\n\n\n\n\n\n");
+		}
+		else{
+			this.product = Items.HONEYCOMB;
+			System.out.println("\n\n\n\n\n\n\n\n\nBee choose HONEY\n\n\n\n\n\n\n\n\n");
+		}
+	}
 	
 	protected void defineSynchedData() {
 		super.defineSynchedData();
@@ -1139,6 +1158,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 
 		public void stop() {
 			if (this.hasPollinatedLongEnough()) {
+				SetProductFromFlower(level.getBlockState(MysteriousBee.this.savedFlowerPos).getBlock());
 				MysteriousBee.this.setHasNectar(true);
 			}
 
