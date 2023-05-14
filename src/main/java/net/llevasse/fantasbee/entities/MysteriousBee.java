@@ -103,6 +103,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			EntityDataSerializers.BYTE);
 	private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(MysteriousBee.class,
 			EntityDataSerializers.INT);
+   	private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(MysteriousBee.class,
+			EntityDataSerializers.ITEM_STACK);
 	private static final int FLAG_ROLL = 2;
 	private static final int FLAG_HAS_STUNG = 4;
 	private static final int FLAG_HAS_NECTAR = 8;
@@ -169,15 +171,15 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 	
 	public void SetProductFromFlower(Block block){
 		if (block.equals(Blocks.POPPY)){
-			this.product = Items.RED_DYE;
+			this.entityData.set(DATA_ITEM, new ItemStack(Items.RED_DYE));
 			System.out.println("\n\n\n\n\n\n\n\n\nBee choose RED_DYE\n\n\n\n\n\n\n\n\n");
 		}
 		else if (block.equals(Blocks.WITHER_ROSE)){
-			this.product = Items.BLACK_DYE;
+			this.entityData.set(DATA_ITEM, new ItemStack(Items.BLACK_DYE));
 			System.out.println("\n\n\n\n\n\n\n\n\nBee choose BLACK_DYE\n\n\n\n\n\n\n\n\n");
 		}
 		else{
-			this.product = Items.HONEYCOMB;
+			this.entityData.set(DATA_ITEM, new ItemStack(Items.HONEYCOMB));
 			System.out.println("\n\n\n\n\n\n\n\n\nBee choose HONEY\n\n\n\n\n\n\n\n\n");
 		}
 	}
@@ -186,6 +188,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		super.defineSynchedData();
 		this.entityData.define(DATA_FLAGS_ID, (byte) 0);
 		this.entityData.define(DATA_REMAINING_ANGER_TIME, 0);
+		this.entityData.define(DATA_ITEM, ItemStack.EMPTY);
 	}
 
 	public float getWalkTargetValue(BlockPos p_27788_, LevelReader p_27789_) {
@@ -213,41 +216,51 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, true));
 	}
 
-	public void addAdditionalSaveData(CompoundTag DATA) {
-		super.addAdditionalSaveData(DATA);
+	public void addAdditionalSaveData(CompoundTag nbt) {
+		super.addAdditionalSaveData(nbt);
 		if (this.hasHive()) {
-			DATA.put("HivePos", NbtUtils.writeBlockPos(this.getHivePos()));
+			nbt.put("HivePos", NbtUtils.writeBlockPos(this.getHivePos()));
 		}
 
 		if (this.hasSavedFlowerPos()) {
-			DATA.put("FlowerPos", NbtUtils.writeBlockPos(this.getSavedFlowerPos()));
+			nbt.put("FlowerPos", NbtUtils.writeBlockPos(this.getSavedFlowerPos()));
 		}
-		DATA.putBoolean("HasNectar", this.hasNectar());
-		DATA.putBoolean("HasStung", this.hasStung());
-		DATA.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);
-		DATA.putInt("CannotEnterHiveTicks", this.stayOutOfHiveCountdown);
-		DATA.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
-		this.addPersistentAngerSaveData(DATA);
+		if (!this.entityData.get(DATA_ITEM).isEmpty()){
+			nbt.put("Item", this.entityData.get(DATA_ITEM).save(new CompoundTag()));
+			System.out.printf("\n\n\n\nsaving %s\n\n\n\n", this.entityData.get(DATA_ITEM).getItem().getName(this.entityData.get(DATA_ITEM)).toString());
+		}
+		nbt.putBoolean("HasNectar", this.hasNectar());
+		nbt.putBoolean("HasStung", this.hasStung());
+		nbt.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);
+		nbt.putInt("CannotEnterHiveTicks", this.stayOutOfHiveCountdown);
+		nbt.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
+		this.addPersistentAngerSaveData(nbt);
 	}
 
-	public void readAdditionalSaveData(CompoundTag p_27793_) {
+	public void readAdditionalSaveData(CompoundTag nbt) {
 		this.hivePos = null;
-		if (p_27793_.contains("HivePos")) {
-			this.hivePos = NbtUtils.readBlockPos(p_27793_.getCompound("HivePos"));
+		if (nbt.contains("HivePos")) {
+			this.hivePos = NbtUtils.readBlockPos(nbt.getCompound("HivePos"));
 		}
 
 		this.savedFlowerPos = null;
-		if (p_27793_.contains("FlowerPos")) {
-			this.savedFlowerPos = NbtUtils.readBlockPos(p_27793_.getCompound("FlowerPos"));
+		if (nbt.contains("FlowerPos")) {
+			this.savedFlowerPos = NbtUtils.readBlockPos(nbt.getCompound("FlowerPos"));
+		}
+		super.readAdditionalSaveData(nbt);
+		CompoundTag tag = nbt.getCompound("Item");
+		if (tag != null && !tag.isEmpty()){
+			ItemStack item = ItemStack.of(tag);
+			this.entityData.set(DATA_ITEM, new ItemStack(item.getItem()));
+			System.out.printf("\n\n\n\nread %s\n\n\n\n", item.getItem().getName(item).getString());
 		}
 
-		super.readAdditionalSaveData(p_27793_);
-		this.setHasNectar(p_27793_.getBoolean("HasNectar"));
-		this.setHasStung(p_27793_.getBoolean("HasStung"));
-		this.ticksWithoutNectarSinceExitingHive = p_27793_.getInt("TicksSincePollination");
-		this.stayOutOfHiveCountdown = p_27793_.getInt("CannotEnterHiveTicks");
-		this.numCropsGrownSincePollination = p_27793_.getInt("CropsGrownSincePollination");
-		this.readPersistentAngerSaveData(this.level, p_27793_);
+		this.setHasNectar(nbt.getBoolean("HasNectar"));
+		this.setHasStung(nbt.getBoolean("HasStung"));
+		this.ticksWithoutNectarSinceExitingHive = nbt.getInt("TicksSincePollination");
+		this.stayOutOfHiveCountdown = nbt.getInt("CannotEnterHiveTicks");
+		this.numCropsGrownSincePollination = nbt.getInt("CropsGrownSincePollination");
+		this.readPersistentAngerSaveData(this.level, nbt);
 	}
 
 	public boolean doHurtTarget(Entity p_27722_) {
