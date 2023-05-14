@@ -26,9 +26,9 @@ public class ModPoiTypes extends PoiTypes{
 		return ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, new ResourceLocation(p_218091_));
 	}
 	
-	private static Set<BlockState> getBlockStates(Block block) {
-		return ImmutableSet.copyOf(block.getStateDefinition().getPossibleStates());
-	}
+	// private static Set<BlockState> getBlockStates(ModBlocks block) {
+	// 	return ImmutableSet.copyOf(block.getStateDefinition().getPossibleStates());
+	// }
 	
 	private static PoiType register(Registry<PoiType> p_218085_, ResourceKey<PoiType> p_218086_,
 			Set<BlockState> p_218087_, int p_218088_, int p_218089_) {
@@ -42,7 +42,10 @@ public class ModPoiTypes extends PoiTypes{
 	}
 	
 	public static PoiType bootstrap(Registry<PoiType> registry){
-		return register(registry, MYSTERIOUS_BEEHIVE, getBlockStates(ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK), 0, 0)
-		
+		return register(registry, MYSTERIOUS_BEEHIVE, getBlockStates(ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK), 0, 0);
+	}
+
+	private static Set<BlockState> getBlockStates(RegistryObject<Block> block) {
+		return ImmutableSet.copyOf(block.get().getStateDefinition().getPossibleStates());
 	}
 }

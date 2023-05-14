@@ -2,6 +2,7 @@ package net.llevasse.fantasbee.entities;
 
 import net.llevasse.fantasbee.entities.block_entities.MysteriousBeehiveBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
@@ -38,6 +39,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.VisibleForDebug;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -192,22 +194,21 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, true));
 	}
 
-	public void addAdditionalSaveData(CompoundTag p_27823_) {
-		super.addAdditionalSaveData(p_27823_);
+	public void addAdditionalSaveData(CompoundTag DATA) {
+		super.addAdditionalSaveData(DATA);
 		if (this.hasHive()) {
-			p_27823_.put("HivePos", NbtUtils.writeBlockPos(this.getHivePos()));
+			DATA.put("HivePos", NbtUtils.writeBlockPos(this.getHivePos()));
 		}
 
 		if (this.hasSavedFlowerPos()) {
-			p_27823_.put("FlowerPos", NbtUtils.writeBlockPos(this.getSavedFlowerPos()));
+			DATA.put("FlowerPos", NbtUtils.writeBlockPos(this.getSavedFlowerPos()));
 		}
-
-		p_27823_.putBoolean("HasNectar", this.hasNectar());
-		p_27823_.putBoolean("HasStung", this.hasStung());
-		p_27823_.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);
-		p_27823_.putInt("CannotEnterHiveTicks", this.stayOutOfHiveCountdown);
-		p_27823_.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
-		this.addPersistentAngerSaveData(p_27823_);
+		DATA.putBoolean("HasNectar", this.hasNectar());
+		DATA.putBoolean("HasStung", this.hasStung());
+		DATA.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);
+		DATA.putInt("CannotEnterHiveTicks", this.stayOutOfHiveCountdown);
+		DATA.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
+		this.addPersistentAngerSaveData(DATA);
 	}
 
 	public void readAdditionalSaveData(CompoundTag p_27793_) {
@@ -1007,7 +1008,6 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 						return;
 					}
 				}
-
 				MysteriousBee.this.goToHiveGoal.clearBlacklist();
 				MysteriousBee.this.hivePos = list.get(0);
 			}
@@ -1019,6 +1019,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			Stream<PoiRecord> stream = poimanager.getInRange((p_218130_) -> {
 				return p_218130_.is(PoiTypeTags.BEE_HOME);
 			}, blockpos, 20, PoiManager.Occupancy.ANY);
+			// need to add "doesHiveHaveSameProduce" as a filter 
 			return stream.map(PoiRecord::getPos).filter(MysteriousBee.this::doesHiveHaveSpace)
 					.sorted(Comparator.comparingDouble((p_148811_) -> {
 						return p_148811_.distSqr(blockpos);
@@ -1046,13 +1047,13 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		private static final int MIN_POLLINATION_TICKS = 400;
 		private static final int MIN_FIND_FLOWER_RETRY_COOLDOWN = 20;
 		private static final int MAX_FIND_FLOWER_RETRY_COOLDOWN = 60;
-		private final Predicate<BlockState> VALID_POLLINATION_BLOCKS = (p_28074_) -> {
-			if (p_28074_.hasProperty(BlockStateProperties.WATERLOGGED)
-					&& p_28074_.getValue(BlockStateProperties.WATERLOGGED)) {
+		private final Predicate<BlockState> VALID_POLLINATION_BLOCKS = (block) -> {
+			if (block.hasProperty(BlockStateProperties.WATERLOGGED)
+					&& block.getValue(BlockStateProperties.WATERLOGGED)) {
 				return false;
-			} else if (p_28074_.is(BlockTags.FLOWERS)) {
-				if (p_28074_.is(Blocks.SUNFLOWER)) {
-					return p_28074_.getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER;
+			} else if (block.is(BlockTags.FLOWERS)) {
+				if (block.is(Blocks.SUNFLOWER)) {
+					return block.getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER;
 				} else {
 					return true;
 				}

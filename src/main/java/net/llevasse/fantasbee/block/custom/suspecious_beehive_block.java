@@ -1,23 +1,57 @@
 package net.llevasse.fantasbee.block.custom;
 
 import net.llevasse.fantasbee.entities.block_entities.ModBlockEntities;
+import net.llevasse.fantasbee.entities.block_entities.MysteriousBeehiveBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class suspecious_beehive_block extends base_orientable_block implements EntityBlock{
-	public suspecious_beehive_block(Properties properties){
+public class suspecious_beehive_block extends base_orientable_block implements EntityBlock {
+	public static final IntegerProperty LEVEL_HONEY = IntegerProperty.create("honey_level", 0, 5);
+
+	public suspecious_beehive_block(Properties properties) {
 		super(properties);
-	}
+//		this.registerDefaultState(
+//				this.stateDefinition.any().setValue(LEVEL_HONEY, Integer.valueOf(0)).setValue(FACING, Direction.NORTH));
+	}	
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return ModBlockEntities.MYSTERIOUS_BEEHIVE_BLOCK_ENTITY.get().create(pos, state);
 	}
+
+	public static void dropProduct(Level lvl, BlockPos pos) {
+		BlockEntity entity = lvl.getBlockEntity(pos);
+		if (entity instanceof MysteriousBeehiveBlockEntity blockEntity) {
+			popResource(lvl, pos, new ItemStack(blockEntity.getProduct(), 1));
+		}
+	}
+
+	public InteractionResult use(BlockState state, Level lvl, BlockPos pos, Player player,
+			InteractionHand hand, BlockHitResult hitResult) {
+		ItemStack handItem = player.getItemInHand(hand);
+		//int i = state.getValue(LEVEL_HONEY);
+		Item item = handItem.getItem();
+		if (item == Items.DIAMOND_AXE){
+			dropProduct(lvl, pos);
+			return InteractionResult.sidedSuccess(lvl.isClientSide);
+		}
+		else{
+			return super.use(state, lvl, pos, player, hand, hitResult);
+		}
+	}
 }
-
-
 
 // All nbt data possible for an item_frame
 
