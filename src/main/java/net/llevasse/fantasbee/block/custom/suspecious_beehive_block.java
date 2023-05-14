@@ -3,7 +3,6 @@ package net.llevasse.fantasbee.block.custom;
 import net.llevasse.fantasbee.entities.block_entities.ModBlockEntities;
 import net.llevasse.fantasbee.entities.block_entities.MysteriousBeehiveBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -22,8 +21,6 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 
 	public suspecious_beehive_block(Properties properties) {
 		super(properties);
-//		this.registerDefaultState(
-//				this.stateDefinition.any().setValue(LEVEL_HONEY, Integer.valueOf(0)).setValue(FACING, Direction.NORTH));
 	}	
 
 	@Override
@@ -37,7 +34,8 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 			popResource(lvl, pos, new ItemStack(blockEntity.getProduct(), 1));
 		}
 	}
-
+	
+	@SuppressWarnings("deprecation")
 	public InteractionResult use(BlockState state, Level lvl, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
 		ItemStack handItem = player.getItemInHand(hand);
