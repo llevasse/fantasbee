@@ -1,6 +1,10 @@
 package net.llevasse.fantasbee.entities;
 
+import net.llevasse.fantasbee.FantasBee;
+import net.llevasse.fantasbee.block.ModBlocks;
+import net.llevasse.fantasbee.block.custom.suspecious_beehive_block;
 import net.llevasse.fantasbee.entities.block_entities.MysteriousBeehiveBlockEntity;
+import net.llevasse.fantasbee.poi.ModPoiTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerLevel;
@@ -12,7 +16,10 @@ import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
@@ -72,6 +79,7 @@ import net.minecraft.world.entity.ai.util.AirRandomPos;
 import net.minecraft.world.entity.ai.util.HoverRandomPos;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -93,6 +101,11 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 @SuppressWarnings("unused")
 public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
@@ -101,9 +114,10 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 	public static final int TICKS_PER_FLAP = Mth.ceil(1.4959966F);
 	private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(MysteriousBee.class,
 			EntityDataSerializers.BYTE);
-	private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(MysteriousBee.class,
+	private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(
+			MysteriousBee.class,
 			EntityDataSerializers.INT);
-   	private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(MysteriousBee.class,
+	private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(MysteriousBee.class,
 			EntityDataSerializers.ITEM_STACK);
 	private static final int FLAG_ROLL = 2;
 	private static final int FLAG_HAS_STUNG = 4;
@@ -150,6 +164,24 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 	private MysteriousBee.MysteriousBeeGoToKnownFlowerGoal goToKnownFlowerGoal;
 	private int underWaterTicks;
 
+	public static final DeferredRegister<PoiType> POI_TYPES = DeferredRegister.create(ForgeRegistries.POI_TYPES,
+			FantasBee.MOD_ID);
+	public static final RegistryObject<PoiType> MYSTERIOUS_BEEHIVE_POI = POI_TYPES
+			.register("mysterious_beehive_poi",
+					() -> new PoiType(
+							ImmutableSet.copyOf(
+									ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK.get().getStateDefinition().getPossibleStates()),
+							0, 1));
+
+	public static void registerPoi() {
+		try {
+			ObfuscationReflectionHelper.findMethod(PoiType.class, 
+				"registerBlockStates", PoiType.class).invoke(NULL, MYSTERIOUS_BEEHIVE_POI.get());
+		} catch (InvocationTargetException | IllegalAccessException exception) {
+			exception.printStackTrace();
+		}
+	}
+
 	public MysteriousBee(EntityType<? extends MysteriousBee> Entity, Level lvl) {
 		super(Entity, lvl);
 		this.moveControl = new FlyingMoveControl(this, 20, true);
@@ -166,24 +198,23 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		return MysteriousBee.createAttributes();
 	}
 
-	// need to copy and Override every methods in MysteriousBee.class that use the blocktag
+	// need to copy and Override every methods in MysteriousBee.class that use the
+	// blocktag
 	// "BEEHIVES"
-	
-	public void SetProductFromFlower(Block block){
-		if (block.equals(Blocks.POPPY)){
+
+	public void SetProductFromFlower(Block block) {
+		if (block.equals(Blocks.POPPY)) {
 			this.entityData.set(DATA_ITEM, new ItemStack(Items.RED_DYE));
 			System.out.println("\n\n\n\n\n\n\n\n\nBee choose RED_DYE\n\n\n\n\n\n\n\n\n");
-		}
-		else if (block.equals(Blocks.WITHER_ROSE)){
+		} else if (block.equals(Blocks.WITHER_ROSE)) {
 			this.entityData.set(DATA_ITEM, new ItemStack(Items.BLACK_DYE));
 			System.out.println("\n\n\n\n\n\n\n\n\nBee choose BLACK_DYE\n\n\n\n\n\n\n\n\n");
-		}
-		else{
+		} else {
 			this.entityData.set(DATA_ITEM, new ItemStack(Items.HONEYCOMB));
 			System.out.println("\n\n\n\n\n\n\n\n\nBee choose HONEY\n\n\n\n\n\n\n\n\n");
 		}
 	}
-	
+
 	protected void defineSynchedData() {
 		super.defineSynchedData();
 		this.entityData.define(DATA_FLAGS_ID, (byte) 0);
@@ -211,7 +242,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		this.goalSelector.addGoal(7, new MysteriousBee.MysteriousBeeGrowCropGoal());
 		this.goalSelector.addGoal(8, new MysteriousBee.MysteriousBeeWanderGoal());
 		this.goalSelector.addGoal(9, new FloatGoal(this));
-		this.targetSelector.addGoal(1, (new MysteriousBee.MysteriousBeeHurtByOtherGoal(this)).setAlertOthers(new Class[0]));
+		this.targetSelector.addGoal(1,
+				(new MysteriousBee.MysteriousBeeHurtByOtherGoal(this)).setAlertOthers(new Class[0]));
 		this.targetSelector.addGoal(2, new MysteriousBee.MysteriousBeeBecomeAngryTargetGoal(this));
 		this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, true));
 	}
@@ -225,9 +257,10 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		if (this.hasSavedFlowerPos()) {
 			nbt.put("FlowerPos", NbtUtils.writeBlockPos(this.getSavedFlowerPos()));
 		}
-		if (!this.entityData.get(DATA_ITEM).isEmpty()){
+		if (!this.entityData.get(DATA_ITEM).isEmpty()) {
 			nbt.put("Item", this.entityData.get(DATA_ITEM).save(new CompoundTag()));
-			System.out.printf("\n\n\n\nsaving %s\n\n\n\n", this.entityData.get(DATA_ITEM).getItem().getName(this.entityData.get(DATA_ITEM)).toString());
+			System.out.printf("\n\n\n\nsaving %s\n\n\n\n",
+					this.entityData.get(DATA_ITEM).getItem().getName(this.entityData.get(DATA_ITEM)).toString());
 		}
 		nbt.putBoolean("HasNectar", this.hasNectar());
 		nbt.putBoolean("HasStung", this.hasStung());
@@ -249,7 +282,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 		super.readAdditionalSaveData(nbt);
 		CompoundTag tag = nbt.getCompound("Item");
-		if (tag != null && !tag.isEmpty()){
+		if (tag != null && !tag.isEmpty()) {
 			ItemStack item = ItemStack.of(tag);
 			this.entityData.set(DATA_ITEM, new ItemStack(item.getItem()));
 			System.out.printf("\n\n\n\nread %s\n\n\n\n", item.getItem().getName(item).getString());
@@ -430,7 +463,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			return false;
 		} else {
 			BlockEntity blockentity = this.level.getBlockEntity(this.hivePos);
-			return blockentity instanceof MysteriousBeehiveBlockEntity && ((MysteriousBeehiveBlockEntity)blockentity).isFireNearby();
+			return blockentity instanceof MysteriousBeehiveBlockEntity
+					&& ((MysteriousBeehiveBlockEntity) blockentity).isFireNearby();
 		}
 	}
 
@@ -458,7 +492,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 	private boolean doesHiveHaveSpace(BlockPos p_27885_) {
 		BlockEntity blockentity = this.level.getBlockEntity(p_27885_);
 		if (blockentity instanceof MysteriousBeehiveBlockEntity) {
-			return !((MysteriousBeehiveBlockEntity)blockentity).isFull();
+			return !((MysteriousBeehiveBlockEntity) blockentity).isFull();
 		} else {
 			return false;
 		}
@@ -480,11 +514,12 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		return this.goalSelector;
 	}
 
-/* 	protected void sendDebugPackets() {
-		super.sendDebugPackets();
-		DebugPackets.sendBeeInfo((Bee)this);
-	}
- */
+	/*
+	 * protected void sendDebugPackets() {
+	 * super.sendDebugPackets();
+	 * DebugPackets.sendBeeInfo((Bee)this);
+	 * }
+	 */
 	int getCropsGrownSincePollination() {
 		return this.numCropsGrownSincePollination;
 	}
@@ -751,7 +786,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 					&& MysteriousBee.this.hivePos.closerToCenterThan(MysteriousBee.this.position(), 2.0D)) {
 				BlockEntity blockentity = MysteriousBee.this.level.getBlockEntity(MysteriousBee.this.hivePos);
 				if (blockentity instanceof MysteriousBeehiveBlockEntity) {
-					MysteriousBeehiveBlockEntity MysteriousBeehiveblockentity = (MysteriousBeehiveBlockEntity)blockentity;
+					MysteriousBeehiveBlockEntity MysteriousBeehiveblockentity = (MysteriousBeehiveBlockEntity) blockentity;
 					if (!MysteriousBeehiveblockentity.isFull()) {
 						return true;
 					}
@@ -792,7 +827,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public boolean canBeeUse() {
-			return MysteriousBee.this.hivePos != null && !MysteriousBee.this.hasRestriction() && MysteriousBee.this.wantsToEnterHive()
+			return MysteriousBee.this.hivePos != null && !MysteriousBee.this.hasRestriction()
+					&& MysteriousBee.this.wantsToEnterHive()
 					&& !this.hasReachedTarget(MysteriousBee.this.hivePos)
 					&& MysteriousBee.this.level.getBlockState(MysteriousBee.this.hivePos).is(BlockTags.BEEHIVES);
 		}
@@ -830,7 +866,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 						boolean flag = this.pathfindDirectlyTowards(MysteriousBee.this.hivePos);
 						if (!flag) {
 							this.dropAndBlacklistHive();
-						} else if (this.lastPath != null && MysteriousBee.this.navigation.getPath().sameAs(this.lastPath)) {
+						} else if (this.lastPath != null
+								&& MysteriousBee.this.navigation.getPath().sameAs(this.lastPath)) {
 							++this.ticksStuck;
 							if (this.ticksStuck > 60) {
 								this.dropHive();
@@ -847,9 +884,11 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 
 		private boolean pathfindDirectlyTowards(BlockPos p_27991_) {
 			MysteriousBee.this.navigation.setMaxVisitedNodesMultiplier(10.0F);
-			MysteriousBee.this.navigation.moveTo((double) p_27991_.getX(), (double) p_27991_.getY(), (double) p_27991_.getZ(),
+			MysteriousBee.this.navigation.moveTo((double) p_27991_.getX(), (double) p_27991_.getY(),
+					(double) p_27991_.getZ(),
 					1.0D);
-			return MysteriousBee.this.navigation.getPath() != null && MysteriousBee.this.navigation.getPath().canReach();
+			return MysteriousBee.this.navigation.getPath() != null
+					&& MysteriousBee.this.navigation.getPath().canReach();
 		}
 
 		boolean isTargetBlacklisted(BlockPos p_27994_) {
@@ -901,7 +940,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public boolean canBeeUse() {
-			return MysteriousBee.this.savedFlowerPos != null && !MysteriousBee.this.hasRestriction() && this.wantsToGoToKnownFlower()
+			return MysteriousBee.this.savedFlowerPos != null && !MysteriousBee.this.hasRestriction()
+					&& this.wantsToGoToKnownFlower()
 					&& MysteriousBee.this.isFlowerValid(MysteriousBee.this.savedFlowerPos)
 					&& !MysteriousBee.this.closerThan(MysteriousBee.this.savedFlowerPos, 2);
 		}
@@ -986,7 +1026,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 								integerproperty = SweetBerryBushBlock.AGE;
 							}
 						} else if (blockstate.is(Blocks.CAVE_VINES) || blockstate.is(Blocks.CAVE_VINES_PLANT)) {
-							((BonemealableBlock) blockstate.getBlock()).performBonemeal((ServerLevel) MysteriousBee.this.level,
+							((BonemealableBlock) blockstate.getBlock()).performBonemeal(
+									(ServerLevel) MysteriousBee.this.level,
 									MysteriousBee.this.random, blockpos, blockstate);
 						}
 
@@ -1032,11 +1073,12 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 
 		public void start() {
 			MysteriousBee.this.remainingCooldownBeforeLocatingNewHive = 200;
-			List<BlockPos> list = this.findNearbyHivesWithSpace();
+			List<BlockPos> list = this.findNearbyHive();
 			if (!list.isEmpty()) {
 				for (BlockPos blockpos : list) {
 					if (!MysteriousBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
 						MysteriousBee.this.hivePos = blockpos;
+						System.out.printf("\n\n\n\nhive pos found at x%d, y%d, z%d\n\n\n\n", blockpos.getX(), blockpos.getY(), blockpos.getZ());
 						return;
 					}
 				}
@@ -1045,13 +1087,32 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			}
 		}
 
+		private List<BlockPos> findNearbyHive(){
+			BlockPos checkPos = MysteriousBee.this.blockPosition();
+			List<BlockPos> closestPos = Lists.newArrayList();
+			Block targetBlock = ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK.get();
+			for (int x = checkPos.getX() - 7; x < checkPos.getX() + 7; x++){
+				for (int y = checkPos.getY() - 7; y < checkPos.getY() + 7; y++){
+					for (int z = checkPos.getZ() - 7; z < checkPos.getZ() + 7; z++){
+						checkPos = new BlockPos(x, y, z);
+						if (level.getBlockState(checkPos).getBlock() == targetBlock)
+						{
+							if (MysteriousBeehiveBlockEntity.CanHiveAcceptBee(level, checkPos))
+								closestPos.add(checkPos);
+						}
+					}
+				}
+			}
+			return closestPos;
+		}
+
 		private List<BlockPos> findNearbyHivesWithSpace() {
 			BlockPos blockpos = MysteriousBee.this.blockPosition();
 			PoiManager poimanager = ((ServerLevel) MysteriousBee.this.level).getPoiManager();
-			Stream<PoiRecord> stream = poimanager.getInRange((p_218130_) -> {
-				return p_218130_.is(PoiTypeTags.BEE_HOME);
+			Stream<PoiRecord> stream = poimanager.getInRange((holder) -> {
+				return holder.equals(MysteriousBee.MYSTERIOUS_BEEHIVE_POI.getHolder().get());
 			}, blockpos, 20, PoiManager.Occupancy.ANY);
-			// need to add "doesHiveHaveSameProduce" as a filter 
+			// need to add "doesHiveHaveSameProduce" as a filter
 			return stream.map(PoiRecord::getPos).filter(MysteriousBee.this::doesHiveHaveSpace)
 					.sorted(Comparator.comparingDouble((p_148811_) -> {
 						return p_148811_.distSqr(blockpos);
@@ -1126,7 +1187,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 							(double) MysteriousBee.this.savedFlowerPos.getZ() + 0.5D, (double) 1.2F);
 					return true;
 				} else {
-					MysteriousBee.this.remainingCooldownBeforeLocatingNewFlower = Mth.nextInt(MysteriousBee.this.random, 20, 60);
+					MysteriousBee.this.remainingCooldownBeforeLocatingNewFlower = Mth.nextInt(MysteriousBee.this.random,
+							20, 60);
 					return false;
 				}
 			}
@@ -1141,7 +1203,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 				return false;
 			} else if (this.hasPollinatedLongEnough()) {
 				return MysteriousBee.this.random.nextFloat() < 0.2F;
-			} else if (MysteriousBee.this.tickCount % 20 == 0 && !MysteriousBee.this.isFlowerValid(MysteriousBee.this.savedFlowerPos)) {
+			} else if (MysteriousBee.this.tickCount % 20 == 0
+					&& !MysteriousBee.this.isFlowerValid(MysteriousBee.this.savedFlowerPos)) {
 				MysteriousBee.this.savedFlowerPos = null;
 				return false;
 			} else {
@@ -1233,7 +1296,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		private void setWantedPos() {
-			MysteriousBee.this.getMoveControl().setWantedPosition(this.hoverPos.x(), this.hoverPos.y(), this.hoverPos.z(),
+			MysteriousBee.this.getMoveControl().setWantedPosition(this.hoverPos.x(), this.hoverPos.y(),
+					this.hoverPos.z(),
 					(double) 0.35F);
 		}
 
@@ -1255,7 +1319,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 						for (int l = k < j && k > -j ? j : 0; l <= j; l = l > 0 ? -l : 1 - l) {
 							blockpos$mutableblockpos.setWithOffset(blockpos, k, i - 1, l);
 							if (blockpos.closerThan(blockpos$mutableblockpos, p_28077_)
-									&& p_28076_.test(MysteriousBee.this.level.getBlockState(blockpos$mutableblockpos))) {
+									&& p_28076_
+											.test(MysteriousBee.this.level.getBlockState(blockpos$mutableblockpos))) {
 								return Optional.of(blockpos$mutableblockpos);
 							}
 						}
@@ -1285,7 +1350,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		public void start() {
 			Vec3 vec3 = this.findPos();
 			if (vec3 != null) {
-				MysteriousBee.this.navigation.moveTo(MysteriousBee.this.navigation.createPath(BlockPos.containing(vec3), 1), 1.0D);
+				MysteriousBee.this.navigation
+						.moveTo(MysteriousBee.this.navigation.createPath(BlockPos.containing(vec3), 1), 1.0D);
 			}
 
 		}
@@ -1303,7 +1369,11 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			int i = 8;
 			Vec3 vec32 = HoverRandomPos.getPos(MysteriousBee.this, 8, 7, vec3.x, vec3.z, ((float) Math.PI / 2F), 3, 1);
 			return vec32 != null ? vec32
-					: AirAndWaterRandomPos.getPos(MysteriousBee.this, 8, 4, -2, vec3.x, vec3.z, (double) ((float) Math.PI / 2F));
+					: AirAndWaterRandomPos.getPos(MysteriousBee.this, 8, 4, -2, vec3.x, vec3.z,
+							(double) ((float) Math.PI / 2F));
 		}
+	}
+	public static void register(IEventBus eventBus) {
+		POI_TYPES.register(eventBus);
 	}
 }

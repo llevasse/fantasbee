@@ -19,7 +19,7 @@ public class PoiTypeTagsProvider extends TagsProvider<PoiType> {
 	}
 
 	protected void addTags(HolderLookup.Provider provider) {
-		this.tag(PoiTypeTags.BEE_HOME).add(PoiTypes.BEEHIVE, PoiTypes.BEE_NEST);
+		this.tag(PoiTypeTags.BEE_HOME).add(PoiTypes.BEEHIVE, PoiTypes.BEE_NEST, ModPoiTypes.MYSTERIOUS_BEEHIVE.getKey());
 	}
 
 }

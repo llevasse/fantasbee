@@ -49,6 +49,15 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 			return super.use(state, lvl, pos, player, hand, hitResult);
 		}
 	}
+	
+	public static boolean hiveContainsBees(Level p_49655_, BlockPos p_49656_) {
+		BlockEntity blockentity = p_49655_.getBlockEntity(p_49656_);
+		if (blockentity instanceof MysteriousBeehiveBlockEntity beehiveblockentity) {
+			return !beehiveblockentity.isEmpty();
+		} else {
+			return false;
+		}
+	}
 }
 
 // All nbt data possible for an item_frame
