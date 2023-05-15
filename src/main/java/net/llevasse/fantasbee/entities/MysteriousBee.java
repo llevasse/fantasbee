@@ -1075,25 +1075,29 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			MysteriousBee.this.remainingCooldownBeforeLocatingNewHive = 200;
 			List<BlockPos> list = this.findNearbyHive();
 			if (!list.isEmpty()) {
-				for (BlockPos blockpos : list) {
-					if (!MysteriousBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
-						MysteriousBee.this.hivePos = blockpos;
-						System.out.printf("\n\n\n\nhive pos found at x%d, y%d, z%d\n\n\n\n", blockpos.getX(), blockpos.getY(), blockpos.getZ());
-						return;
-					}
-				}
+				// for some reason this code make whole thing extremly laggy
+				// for (BlockPos blockpos : list) {
+				// 	if (!MysteriousBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
+				// 		MysteriousBee.this.hivePos = blockpos;
+				// 		return;
+				// 	}
+				// }
 				MysteriousBee.this.goToHiveGoal.clearBlacklist();
 				MysteriousBee.this.hivePos = list.get(0);
+				System.out.printf("\n\n\n\nhive pos found at x%d, y%d, z%d\n\n\n\n", MysteriousBee.this.hivePos.getX(), MysteriousBee.this.hivePos.getY(), MysteriousBee.this.hivePos.getZ());
 			}
+			else
+				System.out.printf("\n\n\n\nNo hive\n\n\n\n");
 		}
 
 		private List<BlockPos> findNearbyHive(){
 			BlockPos checkPos = MysteriousBee.this.blockPosition();
 			List<BlockPos> closestPos = Lists.newArrayList();
 			Block targetBlock = ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK.get();
-			for (int x = checkPos.getX() - 7; x < checkPos.getX() + 7; x++){
-				for (int y = checkPos.getY() - 7; y < checkPos.getY() + 7; y++){
-					for (int z = checkPos.getZ() - 7; z < checkPos.getZ() + 7; z++){
+			int	area_radius = 1;
+			for (int x = checkPos.getX() - area_radius; x < checkPos.getX() + area_radius; x++){
+				for (int y = checkPos.getY() - area_radius; y < checkPos.getY() + area_radius; y++){
+					for (int z = checkPos.getZ() - area_radius; z < checkPos.getZ() + area_radius; z++){
 						checkPos = new BlockPos(x, y, z);
 						if (level.getBlockState(checkPos).getBlock() == targetBlock)
 						{
