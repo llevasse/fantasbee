@@ -175,8 +175,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 
 	public static void registerPoi() {
 		try {
-			ObfuscationReflectionHelper.findMethod(PoiType.class, 
-				"registerBlockStates", PoiType.class).invoke(NULL, MYSTERIOUS_BEEHIVE_POI.get());
+			ObfuscationReflectionHelper.findMethod(PoiType.class,
+					"registerBlockStates", PoiType.class).invoke(NULL, MYSTERIOUS_BEEHIVE_POI.get());
 		} catch (InvocationTargetException | IllegalAccessException exception) {
 			exception.printStackTrace();
 		}
@@ -1077,35 +1077,39 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			if (!list.isEmpty()) {
 				// for some reason this code make whole thing extremly laggy
 				// for (BlockPos blockpos : list) {
-				// 	if (!MysteriousBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
-				// 		MysteriousBee.this.hivePos = blockpos;
-				// 		return;
-				// 	}
+				// if (!MysteriousBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
+				// MysteriousBee.this.hivePos = blockpos;
+				// return;
+				// }
 				// }
 				MysteriousBee.this.goToHiveGoal.clearBlacklist();
 				MysteriousBee.this.hivePos = list.get(0);
-				System.out.printf("\n\n\n\nhive pos found at x%d, y%d, z%d\n\n\n\n", MysteriousBee.this.hivePos.getX(), MysteriousBee.this.hivePos.getY(), MysteriousBee.this.hivePos.getZ());
 			}
-			else
-				System.out.printf("\n\n\n\nNo hive\n\n\n\n");
 		}
 
-		private List<BlockPos> findNearbyHive(){
-			BlockPos checkPos = MysteriousBee.this.blockPosition();
+		private List<BlockPos> findNearbyHive() {
+			BlockPos beePos = MysteriousBee.this.blockPosition();
 			List<BlockPos> closestPos = Lists.newArrayList();
 			Block targetBlock = ModBlocks.SUSPECISOUS_BEEHIVE_BLOCK.get();
-			int	area_radius = 1;
-			for (int x = checkPos.getX() - area_radius; x < checkPos.getX() + area_radius; x++){
-				for (int y = checkPos.getY() - area_radius; y < checkPos.getY() + area_radius; y++){
-					for (int z = checkPos.getZ() - area_radius; z < checkPos.getZ() + area_radius; z++){
-						checkPos = new BlockPos(x, y, z);
-						if (level.getBlockState(checkPos).getBlock() == targetBlock)
-						{
-							if (MysteriousBeehiveBlockEntity.CanHiveAcceptBee(level, checkPos))
-								closestPos.add(checkPos);
+			int area_radius = 1;
+			while (area_radius < 8) {
+				for (int x = beePos.getX() - area_radius; x < beePos.getX() + area_radius; x++) {
+					for (int y = beePos.getY() - area_radius; y < beePos.getY() + area_radius; y++) {
+						for (int z = beePos.getZ() - area_radius; z < beePos.getZ() + area_radius; z++) {
+							BlockPos checkPos = new BlockPos(x, y, z);
+							if (level.getBlockState(checkPos).getBlock().equals(targetBlock)) {
+								System.out.printf("\n\n\n\nfound a hive at x:%d y%d z%d\n", x, y, z);
+								if (MysteriousBeehiveBlockEntity.CanHiveAcceptBee(level, checkPos)) {
+									closestPos.add(checkPos);
+								}
+							}
 						}
 					}
 				}
+			if (closestPos.isEmpty())
+				area_radius++;
+			else
+				break;
 			}
 			return closestPos;
 		}
@@ -1377,6 +1381,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 							(double) ((float) Math.PI / 2F));
 		}
 	}
+
 	public static void register(IEventBus eventBus) {
 		POI_TYPES.register(eventBus);
 	}
