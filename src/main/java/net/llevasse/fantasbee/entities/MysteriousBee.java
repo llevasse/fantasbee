@@ -14,6 +14,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import com.google.common.collect.ImmutableSet;
@@ -158,7 +159,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 	@Nullable
 	BlockPos hivePos;
 	@Nullable
-	Item product;
+	public Item product;
 	MysteriousBee.MysteriousBeePollinateGoal beePollinateGoal;
 	MysteriousBee.MysteriousBeeGoToHiveGoal goToHiveGoal;
 	private MysteriousBee.MysteriousBeeGoToKnownFlowerGoal goToKnownFlowerGoal;
@@ -804,8 +805,8 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 
 		public void start() {
 			BlockEntity blockentity = MysteriousBee.this.level.getBlockEntity(MysteriousBee.this.hivePos);
-			if (blockentity instanceof MysteriousBeehiveBlockEntity beehiveblockentity) {
-				beehiveblockentity.addOccupant(MysteriousBee.this, MysteriousBee.this.hasNectar());
+			if (blockentity instanceof MysteriousBeehiveBlockEntity block) {
+				block.addOccupant(MysteriousBee.this, MysteriousBee.this.hasNectar());
 			}
 
 		}
@@ -1076,15 +1077,18 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			List<BlockPos> list = this.findNearbyHive();
 			if (!list.isEmpty()) {
 				// for some reason this code make whole thing extremly laggy
-				// for (BlockPos blockpos : list) {
-				// if (!MysteriousBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
-				// MysteriousBee.this.hivePos = blockpos;
-				// return;
-				// }
-				// }
+				for (BlockPos blockpos : list) {
+					if (!MysteriousBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
+						MysteriousBee.this.hivePos = blockpos;
+						return;
+					}
+				}
 				MysteriousBee.this.goToHiveGoal.clearBlacklist();
 				MysteriousBee.this.hivePos = list.get(0);
+				System.out.print("\n\n\nFound h²ive :)\n\n");
 			}
+			else
+				System.out.print("\n\n\nDidn't find hive :(\n\n");
 		}
 
 		private List<BlockPos> findNearbyHive() {
@@ -1106,10 +1110,10 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 						}
 					}
 				}
-			if (closestPos.isEmpty())
-				area_radius++;
-			else
-				break;
+				if (closestPos.isEmpty())
+					area_radius++;
+				else
+					break;
 			}
 			return closestPos;
 		}
@@ -1380,6 +1384,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 					: AirAndWaterRandomPos.getPos(MysteriousBee.this, 8, 4, -2, vec3.x, vec3.z,
 							(double) ((float) Math.PI / 2F));
 		}
+
 	}
 
 	public static void register(IEventBus eventBus) {
