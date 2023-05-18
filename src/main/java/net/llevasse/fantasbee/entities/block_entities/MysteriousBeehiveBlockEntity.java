@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -71,8 +72,10 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		ContainerHelper.loadAllItems(nbt, product);
 	}
 
-	public void setProduct(MysteriousBee bee){
+	public void setProduct(MysteriousBee bee) {
 		this.product.set(0, new ItemStack(bee.product));
+		System.out.printf("\n\nnew product : %s\n\n",
+				this.product.get(0).getItem().getName(this.product.get(0)).getString());
 	}
 
 	public ItemLike getProduct() {
@@ -89,9 +92,13 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 
 	}
 
-	public static boolean CanHiveAcceptBee(Level lvl, BlockPos pos) {
+	public static boolean CanHiveAcceptBee(Level lvl, BlockPos pos, Item BeeProduct) {
 		BlockEntity entity = lvl.getBlockEntity(pos);
 		if (entity instanceof MysteriousBeehiveBlockEntity beehiveBlockEntity) {
+			if (!beehiveBlockEntity.product.get(0).getItem().equals(BeeProduct)) {
+				if (!beehiveBlockEntity.product.get(0).getItem().equals(Items.AIR))
+					return false;
+			}
 			if (beehiveBlockEntity.stored.isEmpty() || beehiveBlockEntity.stored.size() < 3)
 				return true;
 		}
@@ -210,16 +217,16 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		return CampfireBlock.isSmokeyPos(this.level, this.getBlockPos());
 	}
 
-	public void addOccupantWithPresetTicks(Entity p_58745_, boolean p_58746_, int p_58747_) {
+	public void addOccupantWithPresetTicks(Entity entity, boolean hasNectar, int p_58747_) {
 		if (this.stored.size() < 3) {
-			p_58745_.stopRiding();
-			p_58745_.ejectPassengers();
+			entity.stopRiding();
+			entity.ejectPassengers();
 			CompoundTag compoundtag = new CompoundTag();
-			p_58745_.save(compoundtag);
-			this.storeBee(compoundtag, p_58747_, p_58746_);
+			entity.save(compoundtag);
+			this.storeBee(compoundtag, p_58747_, hasNectar);
 			if (this.level != null) {
-				if (p_58745_ instanceof Bee) {
-					Bee bee = (Bee) p_58745_;
+				if (entity instanceof MysteriousBee) {
+					MysteriousBee bee = (MysteriousBee) entity;
 					if (bee.hasSavedFlowerPos() && (!this.hasSavedFlowerPos() || this.level.random.nextBoolean())) {
 						this.savedFlowerPos = bee.getSavedFlowerPos();
 					}
@@ -229,10 +236,10 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 				this.level.playSound((Player) null, (double) blockpos.getX(), (double) blockpos.getY(),
 						(double) blockpos.getZ(), SoundEvents.BEEHIVE_ENTER, SoundSource.BLOCKS, 1.0F, 1.0F);
 				this.level.gameEvent(GameEvent.BLOCK_CHANGE, blockpos,
-						GameEvent.Context.of(p_58745_, this.getBlockState()));
+						GameEvent.Context.of(entity, this.getBlockState()));
 			}
 
-			p_58745_.discard();
+			entity.discard();
 			super.setChanged();
 		}
 	}
