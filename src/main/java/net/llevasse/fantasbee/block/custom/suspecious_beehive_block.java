@@ -51,6 +51,12 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 			dropProduct(lvl, pos);
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		}
+		else if (item == Items.AIR){
+			BlockEntity entity = lvl.getBlockEntity(pos);
+			if (entity instanceof MysteriousBeehiveBlockEntity blockEntity) 
+				System.out.printf("\n\nThis hive produce %s\n\n", blockEntity.getProduct().getClass().getName());
+			return InteractionResult.sidedSuccess(lvl.isClientSide);
+		}
 		return InteractionResult.FAIL;
 		// else{
 		// return super.use(state, lvl, pos, player, hand, hitResult);
