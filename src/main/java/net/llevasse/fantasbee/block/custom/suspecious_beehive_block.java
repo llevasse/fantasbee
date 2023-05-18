@@ -1,5 +1,7 @@
 package net.llevasse.fantasbee.block.custom;
 
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+
 import net.llevasse.fantasbee.entities.block_entities.ModBlockEntities;
 import net.llevasse.fantasbee.entities.block_entities.MysteriousBeehiveBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -10,18 +12,21 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class suspecious_beehive_block extends base_orientable_block implements EntityBlock {
-	public static final IntegerProperty LEVEL_HONEY = IntegerProperty.create("honey_level", 0, 5);
+	public static final IntegerProperty LEVEL_HONEY = BlockStateProperties.LEVEL_HONEY;
 
 	public suspecious_beehive_block(Properties properties) {
 		super(properties);
-	}	
+		this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL_HONEY, Integer.valueOf(0)));
+	}
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -34,22 +39,24 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 			popResource(lvl, pos, new ItemStack(blockEntity.getProduct(), 1));
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public InteractionResult use(BlockState state, Level lvl, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
 		ItemStack handItem = player.getItemInHand(hand);
 		int i = state.getValue(LEVEL_HONEY);
 		Item item = handItem.getItem();
-		if (item == Items.DIAMOND_AXE && i >= 5){
+		System.out.printf("\n\n%s used\n\n", item.getClass().getName());
+		if (item == Items.DIAMOND_AXE && i >= 5) {
 			dropProduct(lvl, pos);
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		}
-		else{
-			return super.use(state, lvl, pos, player, hand, hitResult);
-		}
+		return InteractionResult.FAIL;
+		// else{
+		// return super.use(state, lvl, pos, player, hand, hitResult);
+		// }
 	}
-	
+
 	public static boolean hiveContainsBees(Level p_49655_, BlockPos p_49656_) {
 		BlockEntity blockentity = p_49655_.getBlockEntity(p_49656_);
 		if (blockentity instanceof MysteriousBeehiveBlockEntity beehiveblockentity) {
@@ -58,6 +65,12 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 			return false;
 		}
 	}
+
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(FACING);
+		builder.add(LEVEL_HONEY);
+	}
+
 }
 
 // All nbt data possible for an item_frame
