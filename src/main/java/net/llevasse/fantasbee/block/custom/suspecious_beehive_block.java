@@ -46,7 +46,7 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 		ItemStack handItem = player.getItemInHand(hand);
 		int i = state.getValue(LEVEL_HONEY);
 		Item item = handItem.getItem();
-		System.out.printf("\n\n%s used\n\n", item.getClass().getName());
+		System.out.printf("\n\n%s used\n\n", item.getName(handItem).toString());
 		if (item == Items.DIAMOND_AXE && i >= 5) {
 			dropProduct(lvl, pos);
 			return InteractionResult.sidedSuccess(lvl.isClientSide);

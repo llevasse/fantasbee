@@ -804,6 +804,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public void start() {
+			System.out.print("\n\nI want to enter my hive! \n\n");
 			BlockEntity blockentity = MysteriousBee.this.level.getBlockEntity(MysteriousBee.this.hivePos);
 			if (blockentity instanceof MysteriousBeehiveBlockEntity block) {
 				block.addOccupant(MysteriousBee.this, MysteriousBee.this.hasNectar());
@@ -839,6 +840,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public void start() {
+			System.out.print("I want to go to my hive! \n\n");
 			this.travellingTicks = 0;
 			this.ticksStuck = 0;
 			super.start();
@@ -952,6 +954,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public void start() {
+			System.out.print("I want to go to my flower! \n\n");
 			this.travellingTicks = 0;
 			super.start();
 		}
@@ -1085,7 +1088,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 				}
 				MysteriousBee.this.goToHiveGoal.clearBlacklist();
 				MysteriousBee.this.hivePos = list.get(0);
-				System.out.print("\n\n\nFound h²ive :)\n\n");
+				System.out.print("\n\n\nFound hive :)\n\n");
 			}
 			else
 				System.out.print("\n\n\nDidn't find hive :(\n\n");
@@ -1102,9 +1105,10 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 						for (int z = beePos.getZ() - area_radius; z < beePos.getZ() + area_radius; z++) {
 							BlockPos checkPos = new BlockPos(x, y, z);
 							if (level.getBlockState(checkPos).getBlock().equals(targetBlock)) {
-								System.out.printf("\n\n\n\nfound a hive at x:%d y%d z%d\n", x, y, z);
-								if (MysteriousBeehiveBlockEntity.CanHiveAcceptBee(level, checkPos)) {
+								if (MysteriousBeehiveBlockEntity.CanHiveAcceptBee(level, checkPos, MysteriousBee.this.product)) {
+									System.out.printf("\n\n\n\nfound a hive at x:%d y%d z%d\n", x, y, z);
 									closestPos.add(checkPos);
+									break;
 								}
 							}
 						}
