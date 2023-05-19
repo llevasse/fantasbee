@@ -1,6 +1,7 @@
 package net.llevasse.fantasbee.entities.block_entities;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -9,35 +10,33 @@ import com.google.common.collect.Lists;
 
 import net.llevasse.fantasbee.entities.MysteriousBee;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Iterator;
-import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.DebugPackets;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.VisibleForDebug;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
@@ -55,9 +54,7 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 			"Rotation", "CannotEnterHiveTicks", "TicksSincePollination", "CropsGrownSincePollination", "HivePos",
 			"Passengers", "Leash", "UUID");
 	public static final int MAX_OCCUPANTS = 3;
-	private static final int MIN_TICKS_BEFORE_REENTERING_HIVE = 400;
-	private static final int MIN_OCCUPATION_TICKS_NECTAR = 2400;
-	public static final int MIN_OCCUPATION_TICKS_NECTARLESS = 600;
+	public static final int MIN_OCCUPATION_TICKS_NECTARLESS = 20;
 	@Nullable
 	private BlockPos savedFlowerPos;
 
@@ -74,7 +71,7 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 
 	public void setProduct(MysteriousBee bee) {
 		this.product.set(0, new ItemStack(bee.product));
-		System.out.printf("\n\nnew product : %s\n\n",
+		System.out.printf("\n\nfantasbee : new product : %s\n\n",
 				this.product.get(0).getItem().getName(this.product.get(0)).getString());
 	}
 
@@ -125,12 +122,14 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		final CompoundTag entityData;
 		int ticksInHive;
 		final int minOccupationTicks;
+		public int MaxOccupationTicks;
 
-		BeeData(CompoundTag p_58786_, int p_58787_, int p_58788_) {
-			MysteriousBeehiveBlockEntity.removeIgnoredBeeTags(p_58786_);
-			this.entityData = p_58786_;
-			this.ticksInHive = p_58787_;
-			this.minOccupationTicks = p_58788_;
+		BeeData(CompoundTag tag, int ticksInHive, int MinOccupationTick, int MaxOccupationTicks) {
+			MysteriousBeehiveBlockEntity.removeIgnoredBeeTags(tag);
+			this.entityData = tag;
+			this.ticksInHive = ticksInHive;
+			this.minOccupationTicks = MinOccupationTick;
+			this.MaxOccupationTicks = MaxOccupationTicks;
 		}
 	}
 
@@ -166,16 +165,16 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		return this.stored.size() == 3;
 	}
 
-	public void emptyAllLivingFromHive(@Nullable Player p_58749_, BlockState p_58750_,
-			BeehiveBlockEntity.BeeReleaseStatus p_58751_) {
-		List<Entity> list = this.releaseAllOccupants(p_58750_, p_58751_);
-		if (p_58749_ != null) {
+	public void emptyAllLivingFromHive(@Nullable Player player, BlockState state,
+			BeehiveBlockEntity.BeeReleaseStatus ReleaseStatus) {
+		List<Entity> list = this.releaseAllOccupants(state, ReleaseStatus);
+		if (player != null) {
 			for (Entity entity : list) {
 				if (entity instanceof Bee) {
 					Bee bee = (Bee) entity;
-					if (p_58749_.position().distanceToSqr(entity.position()) <= 16.0D) {
+					if (player.position().distanceToSqr(entity.position()) <= 16.0D) {
 						if (!this.isSedated()) {
-							bee.setTarget(p_58749_);
+							bee.setTarget(player);
 						} else {
 							bee.setStayOutOfHiveCountdown(400);
 						}
@@ -199,8 +198,8 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		return list;
 	}
 
-	public void addOccupant(Entity p_58742_, boolean p_58743_) {
-		this.addOccupantWithPresetTicks(p_58742_, p_58743_, 0);
+	public void addOccupant(Entity entity, boolean hasNectar) {
+		this.addOccupantWithPresetTicks(entity, hasNectar, 0);
 	}
 
 	@VisibleForDebug
@@ -217,13 +216,13 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		return CampfireBlock.isSmokeyPos(this.level, this.getBlockPos());
 	}
 
-	public void addOccupantWithPresetTicks(Entity entity, boolean hasNectar, int p_58747_) {
+	public void addOccupantWithPresetTicks(Entity entity, boolean hasNectar, int ticksInHive) {
 		if (this.stored.size() < 3) {
 			entity.stopRiding();
 			entity.ejectPassengers();
 			CompoundTag compoundtag = new CompoundTag();
 			entity.save(compoundtag);
-			this.storeBee(compoundtag, p_58747_, hasNectar);
+			this.storeBee(compoundtag, ticksInHive, hasNectar);
 			if (this.level != null) {
 				if (entity instanceof MysteriousBee) {
 					MysteriousBee bee = (MysteriousBee) entity;
@@ -244,76 +243,77 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		}
 	}
 
-	public void storeBee(CompoundTag p_155158_, int p_155159_, boolean p_155160_) {
-		this.stored.add(new MysteriousBeehiveBlockEntity.BeeData(p_155158_, p_155159_, p_155160_ ? 2400 : 600));
+	public void storeBee(CompoundTag tag, int ticksInHive, boolean MinOccupationTick, boolean MaxOccupationTick) {
+		this.stored.add(new MysteriousBeehiveBlockEntity.BeeData(tag, ticksInHive, MinOccupationTick ? 40 : 20, 
+				MaxOccupationTick ? 60 : 40));
 	}
 
-	private static boolean releaseOccupant(Level p_155137_, BlockPos p_155138_, BlockState p_155139_,
-			MysteriousBeehiveBlockEntity.BeeData p_155140_, @Nullable List<Entity> p_155141_,
+	private static boolean releaseOccupant(Level lvl, BlockPos pos, BlockState state,
+			MysteriousBeehiveBlockEntity.BeeData ThisBeeData, @Nullable List<Entity> BeeList,
 			MysteriousBeehiveBlockEntity.BeeReleaseStatus p_155142_, @Nullable BlockPos p_155143_) {
-		if ((p_155137_.isNight() || p_155137_.isRaining())
+		if ((lvl.isNight() || lvl.isRaining())
 				&& p_155142_ != BeehiveBlockEntity.BeeReleaseStatus.EMERGENCY) {
 			return false;
 		} else {
-			CompoundTag compoundtag = p_155140_.entityData.copy();
+			CompoundTag compoundtag = ThisBeeData.entityData.copy();
 			removeIgnoredBeeTags(compoundtag);
-			compoundtag.put("HivePos", NbtUtils.writeBlockPos(p_155138_));
+			compoundtag.put("HivePos", NbtUtils.writeBlockPos(pos));
 			compoundtag.putBoolean("NoGravity", true);
-			Direction direction = p_155139_.getValue(BeehiveBlock.FACING);
-			BlockPos blockpos = p_155138_.relative(direction);
-			boolean flag = !p_155137_.getBlockState(blockpos).getCollisionShape(p_155137_, blockpos).isEmpty();
+			Direction direction = state.getValue(BeehiveBlock.FACING);
+			BlockPos blockpos = pos.relative(direction);
+			boolean flag = !lvl.getBlockState(blockpos).getCollisionShape(lvl, blockpos).isEmpty();
 			if (flag && p_155142_ != BeehiveBlockEntity.BeeReleaseStatus.EMERGENCY) {
 				return false;
 			} else {
-				Entity entity = EntityType.loadEntityRecursive(compoundtag, p_155137_, (p_58740_) -> {
+				Entity entity = EntityType.loadEntityRecursive(compoundtag, lvl, (p_58740_) -> {
 					return p_58740_;
 				});
 				if (entity != null) {
 					if (!entity.getType().is(EntityTypeTags.BEEHIVE_INHABITORS)) {
 						return false;
 					} else {
-						if (entity instanceof Bee) {
-							Bee bee = (Bee) entity;
-							if (p_155143_ != null && !bee.hasSavedFlowerPos() && p_155137_.random.nextFloat() < 0.9F) {
+						if (entity instanceof MysteriousBee) {
+							MysteriousBee bee = (MysteriousBee) entity;
+							if (p_155143_ != null && !bee.hasSavedFlowerPos() && lvl.random.nextFloat() < 0.9F) {
 								bee.setSavedFlowerPos(p_155143_);
 							}
 
 							if (p_155142_ == BeehiveBlockEntity.BeeReleaseStatus.HONEY_DELIVERED) {
 								bee.dropOffNectar();
-								if (p_155139_.is(BlockTags.BEEHIVES, (p_202037_) -> {
+								if (state.is(BlockTags.BEEHIVES, (p_202037_) -> {
 									return p_202037_.hasProperty(BeehiveBlock.HONEY_LEVEL);
 								})) {
-									int i = getHoneyLevel(p_155139_);
+									int i = getHoneyLevel(state);
 									if (i < 5) {
-										int j = p_155137_.random.nextInt(100) == 0 ? 2 : 1;
+										int j = lvl.random.nextInt(100) == 0 ? 2 : 1;
 										if (i + j > 5) {
 											--j;
 										}
 
-										p_155137_.setBlockAndUpdate(p_155138_,
-												p_155139_.setValue(BeehiveBlock.HONEY_LEVEL, Integer.valueOf(i + j)));
+										lvl.setBlockAndUpdate(pos,
+												state.setValue(BeehiveBlock.HONEY_LEVEL, Integer.valueOf(i + j)));
 									}
 								}
 							}
 
-							setBeeReleaseData(p_155140_.ticksInHive, bee);
-							if (p_155141_ != null) {
-								p_155141_.add(bee);
+							setBeeReleaseData(ThisBeeData.ticksInHive, bee);
+							if (BeeList != null) {
+								BeeList.add(bee);
 							}
 
 							float f = entity.getBbWidth();
 							double d3 = flag ? 0.0D : 0.55D + (double) (f / 2.0F);
-							double d0 = (double) p_155138_.getX() + 0.5D + d3 * (double) direction.getStepX();
-							double d1 = (double) p_155138_.getY() + 0.5D - (double) (entity.getBbHeight() / 2.0F);
-							double d2 = (double) p_155138_.getZ() + 0.5D + d3 * (double) direction.getStepZ();
+							double d0 = (double) pos.getX() + 0.5D + d3 * (double) direction.getStepX();
+							double d1 = (double) pos.getY() + 0.5D - (double) (entity.getBbHeight() / 2.0F);
+							double d2 = (double) pos.getZ() + 0.5D + d3 * (double) direction.getStepZ();
 							entity.moveTo(d0, d1, d2, entity.getYRot(), entity.getXRot());
 						}
 
-						p_155137_.playSound((Player) null, p_155138_, SoundEvents.BEEHIVE_EXIT, SoundSource.BLOCKS,
+						lvl.playSound((Player) null, pos, SoundEvents.BEEHIVE_EXIT, SoundSource.BLOCKS,
 								1.0F, 1.0F);
-						p_155137_.gameEvent(GameEvent.BLOCK_CHANGE, p_155138_,
-								GameEvent.Context.of(entity, p_155137_.getBlockState(p_155138_)));
-						return p_155137_.addFreshEntity(entity);
+						lvl.gameEvent(GameEvent.BLOCK_CHANGE, pos,
+								GameEvent.Context.of(entity, lvl.getBlockState(pos)));
+						return lvl.addFreshEntity(entity);
 					}
 				} else {
 					return false;
@@ -329,36 +329,44 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 
 	}
 
-	private static void setBeeReleaseData(int p_58737_, Bee p_58738_) {
-		int i = p_58738_.getAge();
+	private static void setBeeReleaseData(int ticksInHive, MysteriousBee bee) {
+		int i = bee.getAge();
 		if (i < 0) {
-			p_58738_.setAge(Math.min(0, i + p_58737_));
+			bee.setAge(Math.min(0, i + ticksInHive));
 		} else if (i > 0) {
-			p_58738_.setAge(Math.max(0, i - p_58737_));
+			bee.setAge(Math.max(0, i - ticksInHive));
 		}
 
-		p_58738_.setInLoveTime(Math.max(0, p_58738_.getInLoveTime() - p_58737_));
+		bee.setInLoveTime(Math.max(0, bee.getInLoveTime() - ticksInHive));
 	}
 
 	private boolean hasSavedFlowerPos() {
 		return this.savedFlowerPos != null;
 	}
 
-	private static void tickOccupants(Level p_155150_, BlockPos p_155151_, BlockState p_155152_,
-			List<MysteriousBeehiveBlockEntity.BeeData> p_155153_, @Nullable BlockPos p_155154_) {
+	private static void tickOccupants(Level lvl, BlockPos pos, BlockState state,
+			List<MysteriousBeehiveBlockEntity.BeeData> BeeList, @Nullable BlockPos flowerPos) {
 		boolean flag = false;
 
+		if (!BeeList.isEmpty()){
+			int ticksInBeeOne = BeeList.get(0).ticksInHive;
+			int maxTickBeeOne = BeeList.get(0).MaxOccupationTicks;
+			System.out.printf("\n\nfantasbee : bee 1 ticks in\n\n", ticksInBeeOne);
+			System.out.printf("\n\nfantasbee : bee 1 ticks before MaxTick\n\n", maxTickBeeOne - ticksInBeeOne);
+		}
 		MysteriousBeehiveBlockEntity.BeeData MysteriousBeehiveBlockEntity$beedata;
-		for (Iterator<MysteriousBeehiveBlockEntity.BeeData> iterator = p_155153_.iterator(); iterator
+		for (Iterator<MysteriousBeehiveBlockEntity.BeeData> iterator = BeeList.iterator(); iterator
 				.hasNext(); ++MysteriousBeehiveBlockEntity$beedata.ticksInHive) {
 			MysteriousBeehiveBlockEntity$beedata = iterator.next();
-			if (MysteriousBeehiveBlockEntity$beedata.ticksInHive > MysteriousBeehiveBlockEntity$beedata.minOccupationTicks) {
+			if (MysteriousBeehiveBlockEntity$beedata.ticksInHive > MysteriousBeehiveBlockEntity$beedata.minOccupationTicks
+					|| MysteriousBeehiveBlockEntity$beedata.ticksInHive > MysteriousBeehiveBlockEntity$beedata.MaxOccupationTicks) {
+				System.out.print("\n\nfantasbee : I want to leave this hive\n\n");
 				MysteriousBeehiveBlockEntity.BeeReleaseStatus MysteriousBeehiveBlockEntity$beereleasestatus = MysteriousBeehiveBlockEntity$beedata.entityData
 						.getBoolean("HasNectar") ? MysteriousBeehiveBlockEntity.BeeReleaseStatus.HONEY_DELIVERED
 								: MysteriousBeehiveBlockEntity.BeeReleaseStatus.BEE_RELEASED;
-				if (releaseOccupant(p_155150_, p_155151_, p_155152_, MysteriousBeehiveBlockEntity$beedata,
+				if (releaseOccupant(lvl, pos, state, MysteriousBeehiveBlockEntity$beedata,
 						(List<Entity>) null,
-						MysteriousBeehiveBlockEntity$beereleasestatus, p_155154_)) {
+						MysteriousBeehiveBlockEntity$beereleasestatus, flowerPos)) {
 					flag = true;
 					iterator.remove();
 				}
@@ -366,7 +374,7 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		}
 
 		if (flag) {
-			setChanged(p_155150_, p_155151_, p_155152_);
+			setChanged(lvl, pos, state);
 		}
 
 	}

@@ -206,13 +206,13 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 	public void SetProductFromFlower(Block block) {
 		if (block.equals(Blocks.POPPY)) {
 			this.entityData.set(DATA_ITEM, new ItemStack(Items.RED_DYE));
-			System.out.println("\n\n\n\n\n\n\n\n\nBee choose RED_DYE\n\n\n\n\n\n\n\n\n");
+			System.out.println("\n\nfantasbee : Bee choose RED_DYE\n\n");
 		} else if (block.equals(Blocks.WITHER_ROSE)) {
 			this.entityData.set(DATA_ITEM, new ItemStack(Items.BLACK_DYE));
-			System.out.println("\n\n\n\n\n\n\n\n\nBee choose BLACK_DYE\n\n\n\n\n\n\n\n\n");
+			System.out.println("\n\nfantasbee : Bee choose BLACK_DYE\n\n");
 		} else {
 			this.entityData.set(DATA_ITEM, new ItemStack(Items.HONEYCOMB));
-			System.out.println("\n\n\n\n\n\n\n\n\nBee choose HONEY\n\n\n\n\n\n\n\n\n");
+			System.out.println("\n\nfantasbee : Bee choose HONEY\n\n");
 		}
 	}
 
@@ -260,7 +260,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 		if (!this.entityData.get(DATA_ITEM).isEmpty()) {
 			nbt.put("Item", this.entityData.get(DATA_ITEM).save(new CompoundTag()));
-			System.out.printf("\n\n\n\nsaving %s\n\n\n\n",
+			System.out.printf("\n\nfantasbee : saving %s\n\n\n\n",
 					this.entityData.get(DATA_ITEM).getItem().getName(this.entityData.get(DATA_ITEM)).toString());
 		}
 		nbt.putBoolean("HasNectar", this.hasNectar());
@@ -286,7 +286,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		if (tag != null && !tag.isEmpty()) {
 			ItemStack item = ItemStack.of(tag);
 			this.entityData.set(DATA_ITEM, new ItemStack(item.getItem()));
-			System.out.printf("\n\n\n\nread %s\n\n\n\n", item.getItem().getName(item).getString());
+			System.out.printf("\n\nfantasbee : read %s\n\n\n\n", item.getItem().getName(item).getString());
 		}
 
 		this.setHasNectar(nbt.getBoolean("HasNectar"));
@@ -804,7 +804,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public void start() {
-			System.out.print("\n\nI want to enter my hive! \n\n");
+			System.out.print("\n\nfantasbee : I want to enter my hive! \n\n");
 			BlockEntity blockentity = MysteriousBee.this.level.getBlockEntity(MysteriousBee.this.hivePos);
 			if (blockentity instanceof MysteriousBeehiveBlockEntity block) {
 				block.addOccupant(MysteriousBee.this, MysteriousBee.this.hasNectar());
@@ -840,7 +840,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public void start() {
-			System.out.print("I want to go to my hive! \n\n");
+			System.out.print("fantasbee I want to go to my hive! \n\n");
 			this.travellingTicks = 0;
 			this.ticksStuck = 0;
 			super.start();
@@ -954,7 +954,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public void start() {
-			System.out.print("I want to go to my flower! \n\n");
+			System.out.print("fantasbee I want to go to my flower! \n\n");
 			this.travellingTicks = 0;
 			super.start();
 		}
@@ -1088,10 +1088,10 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 				}
 				MysteriousBee.this.goToHiveGoal.clearBlacklist();
 				MysteriousBee.this.hivePos = list.get(0);
-				System.out.print("\n\n\nFound hive :)\n\n");
+				System.out.print("\n\nfantasbee : Found hive :)\n\n");
 			}
 			else
-				System.out.print("\n\n\nDidn't find hive :(\n\n");
+				System.out.print("\n\nfantasbee : Didn't find hive :(\n\n");
 		}
 
 		private List<BlockPos> findNearbyHive() {
@@ -1106,7 +1106,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 							BlockPos checkPos = new BlockPos(x, y, z);
 							if (level.getBlockState(checkPos).getBlock().equals(targetBlock)) {
 								if (MysteriousBeehiveBlockEntity.CanHiveAcceptBee(level, checkPos, MysteriousBee.this.product)) {
-									System.out.printf("\n\n\n\nfound a hive at x:%d y%d z%d\n", x, y, z);
+									System.out.printf("\n\nfantasbee : found a hive at x:%d y%d z%d\n", x, y, z);
 									closestPos.add(checkPos);
 									break;
 								}

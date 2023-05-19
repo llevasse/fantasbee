@@ -1,7 +1,7 @@
 package net.llevasse.fantasbee.block.custom;
 
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
-
+import net.llevasse.fantasbee.block.ModBlocks;
 import net.llevasse.fantasbee.entities.block_entities.ModBlockEntities;
 import net.llevasse.fantasbee.entities.block_entities.MysteriousBeehiveBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -11,17 +11,25 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class suspecious_beehive_block extends base_orientable_block implements EntityBlock {
+public class suspecious_beehive_block extends BaseEntityBlock {
 	public static final IntegerProperty LEVEL_HONEY = BlockStateProperties.LEVEL_HONEY;
+	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
 	public suspecious_beehive_block(Properties properties) {
 		super(properties);
@@ -33,6 +41,22 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 		return ModBlockEntities.MYSTERIOUS_BEEHIVE_BLOCK_ENTITY.get().create(pos, state);
 	}
 
+	@SuppressWarnings("deprecation")
+	@Override
+	public BlockState mirror(BlockState state, Mirror mirrorIn) {
+		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
+	}
+
+	@Override
+	public BlockState rotate(BlockState state, Rotation rotation) {
+		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+	}
+
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+	}
+
 	public static void dropProduct(Level lvl, BlockPos pos) {
 		BlockEntity entity = lvl.getBlockEntity(pos);
 		if (entity instanceof MysteriousBeehiveBlockEntity blockEntity) {
@@ -40,21 +64,27 @@ public class suspecious_beehive_block extends base_orientable_block implements E
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level lvl, BlockState state, BlockEntityType<T> type) {
+      return type == ModBlockEntities.MYSTERIOUS_BEEHIVE_BLOCK_ENTITY.get() ? (level, pos, blockstate, entity) -> {
+		if (entity instanceof MysteriousBeehiveBlockEntity mysterious_beehive_block)
+			mysterious_beehive_block.serverTick(lvl, pos, state, mysterious_beehive_block);
+      } : null;
+	}
+
 	public InteractionResult use(BlockState state, Level lvl, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
 		ItemStack handItem = player.getItemInHand(hand);
 		int i = state.getValue(LEVEL_HONEY);
 		Item item = handItem.getItem();
-		System.out.printf("\n\n%s used\n\n", item.getName(handItem).toString());
+		System.out.printf("\n\nfantasbee : %s used\n\n", item.getName(handItem).toString());
 		if (item == Items.DIAMOND_AXE && i >= 5) {
 			dropProduct(lvl, pos);
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
-		}
-		else if (item == Items.AIR){
+		} else if (item == Items.AIR) {
 			BlockEntity entity = lvl.getBlockEntity(pos);
-			if (entity instanceof MysteriousBeehiveBlockEntity blockEntity) 
-				System.out.printf("\n\nThis hive produce %s\n\n", blockEntity.getProduct().getClass().getName());
+			if (entity instanceof MysteriousBeehiveBlockEntity blockEntity)
+				System.out.printf("\n\nfantasbee :This hive produce %s\n\n",
+						blockEntity.getProduct().getClass().getName());
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		}
 		return InteractionResult.FAIL;
