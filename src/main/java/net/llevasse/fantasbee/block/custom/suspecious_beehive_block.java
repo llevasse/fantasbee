@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -27,7 +28,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class suspecious_beehive_block extends BaseEntityBlock {
+public class suspecious_beehive_block extends Block implements EntityBlock {
 	public static final IntegerProperty LEVEL_HONEY = BlockStateProperties.LEVEL_HONEY;
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
