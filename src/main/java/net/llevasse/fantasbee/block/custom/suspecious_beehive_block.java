@@ -1,7 +1,6 @@
 package net.llevasse.fantasbee.block.custom;
 
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
-import net.llevasse.fantasbee.block.ModBlocks;
 import net.llevasse.fantasbee.entities.block_entities.ModBlockEntities;
 import net.llevasse.fantasbee.entities.block_entities.MysteriousBeehiveBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -13,8 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;

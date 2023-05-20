@@ -70,7 +70,7 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 	}
 
 	public void setProduct(MysteriousBee bee) {
-		this.product.set(0, new ItemStack(bee.product));
+		this.product.set(0, new ItemStack(bee.getProduct()));
 		System.out.printf("\n\nfantasbee : new product : %s\n\n",
 				this.product.get(0).getItem().getName(this.product.get(0)).getString());
 	}
@@ -199,6 +199,8 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 	}
 
 	public void addOccupant(Entity entity, boolean hasNectar) {
+		if (this.product.get(0).getItem().equals(Items.AIR))
+			this.setProduct((MysteriousBee) entity);
 		this.addOccupantWithPresetTicks(entity, hasNectar, 0);
 	}
 

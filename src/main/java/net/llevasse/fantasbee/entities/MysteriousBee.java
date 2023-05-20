@@ -118,7 +118,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 	private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(
 			MysteriousBee.class,
 			EntityDataSerializers.INT);
-	private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(MysteriousBee.class,
+	public static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(MysteriousBee.class,
 			EntityDataSerializers.ITEM_STACK);
 	private static final int FLAG_ROLL = 2;
 	private static final int FLAG_HAS_STUNG = 4;
@@ -214,6 +214,10 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 			this.entityData.set(DATA_ITEM, new ItemStack(Items.HONEYCOMB));
 			System.out.println("\n\nfantasbee : Bee choose HONEY\n\n");
 		}
+	}
+	
+	public Item getProduct(){
+		return this.entityData.get(DATA_ITEM).getItem();
 	}
 
 	protected void defineSynchedData() {
@@ -1105,7 +1109,7 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 						for (int z = beePos.getZ() - area_radius; z < beePos.getZ() + area_radius; z++) {
 							BlockPos checkPos = new BlockPos(x, y, z);
 							if (level.getBlockState(checkPos).getBlock().equals(targetBlock)) {
-								if (MysteriousBeehiveBlockEntity.CanHiveAcceptBee(level, checkPos, MysteriousBee.this.product)) {
+								if (MysteriousBeehiveBlockEntity.CanHiveAcceptBee(level, checkPos, MysteriousBee.this.entityData.get(DATA_ITEM).getItem())) {
 									System.out.printf("\n\nfantasbee : found a hive at x:%d y%d z%d\n", x, y, z);
 									closestPos.add(checkPos);
 									break;
