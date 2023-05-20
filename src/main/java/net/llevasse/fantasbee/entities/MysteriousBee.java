@@ -262,11 +262,11 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		if (this.hasSavedFlowerPos()) {
 			nbt.put("FlowerPos", NbtUtils.writeBlockPos(this.getSavedFlowerPos()));
 		}
-		if (!this.entityData.get(DATA_ITEM).isEmpty()) {
-			nbt.put("Item", this.entityData.get(DATA_ITEM).save(new CompoundTag()));
-			System.out.printf("\n\nfantasbee : saving %s\n\n\n\n",
-					this.entityData.get(DATA_ITEM).getItem().getName(this.entityData.get(DATA_ITEM)).toString());
-		}
+			if (!this.entityData.get(DATA_ITEM).isEmpty()) {
+				nbt.put("Item", this.entityData.get(DATA_ITEM).save(new CompoundTag()));
+				System.out.printf("\n\nfantasbee : saving %s\n\n\n\n",
+						this.entityData.get(DATA_ITEM).getItem().getName(this.entityData.get(DATA_ITEM)).toString());
+			}
 		nbt.putBoolean("HasNectar", this.hasNectar());
 		nbt.putBoolean("HasStung", this.hasStung());
 		nbt.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);

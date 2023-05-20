@@ -16,6 +16,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.protocol.game.DebugPackets;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -42,7 +45,11 @@ import net.minecraft.world.level.gameevent.GameEvent;
 public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 	protected NonNullList<ItemStack> product = NonNullList.withSize(1, ItemStack.EMPTY);
 	private final List<MysteriousBeehiveBlockEntity.BeeData> stored = Lists.newArrayList();
+	public static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(MysteriousBee.class,
+			EntityDataSerializers.ITEM_STACK);
+
 	public static final String TAG_FLOWER_POS = "FlowerPos";
+	public static final String TAG_PRODUCT = "Product";
 	public static final String MIN_OCCUPATION_TICKS = "MinOccupationTicks";
 	public static final String ENTITY_DATA = "EntityData";
 	public static final String TICKS_IN_HIVE = "TicksInHive";
@@ -67,6 +74,17 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		super.load(nbt);
 		this.product = NonNullList.withSize(1, ItemStack.EMPTY);
 		ContainerHelper.loadAllItems(nbt, product);
+		
+		this.savedFlowerPos = null;
+		if (nbt.contains("FlowerPos")) {
+			this.savedFlowerPos = NbtUtils.readBlockPos(nbt.getCompound("FlowerPos"));
+		}
+		if (nbt.contains("Product")){
+			CompoundTag tag = nbt.get("Product");
+			ItemStack item = ItemStack.of(tag);
+			this.product.set(0, new ItemStack(item.getItem()));
+		}
+
 	}
 
 	public void setProduct(MysteriousBee bee) {
@@ -85,6 +103,9 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		nbt.put("Bees", this.writeBees());
 		if (this.hasSavedFlowerPos()) {
 			nbt.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
+		}
+		if (!this.product.get(0).getItem().equals(Items.AIR)) {
+			nbt.put("Product", product.get(0).save(new CompoundTag()));
 		}
 
 	}
@@ -246,7 +267,7 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 	}
 
 	public void storeBee(CompoundTag tag, int ticksInHive, boolean MinOccupationTick, boolean MaxOccupationTick) {
-		this.stored.add(new MysteriousBeehiveBlockEntity.BeeData(tag, ticksInHive, MinOccupationTick ? 40 : 20, 
+		this.stored.add(new MysteriousBeehiveBlockEntity.BeeData(tag, ticksInHive, MinOccupationTick ? 40 : 20,
 				MaxOccupationTick ? 60 : 40));
 	}
 
@@ -350,7 +371,7 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 			List<MysteriousBeehiveBlockEntity.BeeData> BeeList, @Nullable BlockPos flowerPos) {
 		boolean flag = false;
 
-		if (!BeeList.isEmpty()){
+		if (!BeeList.isEmpty()) {
 			int ticksInBeeOne = BeeList.get(0).ticksInHive;
 			int maxTickBeeOne = BeeList.get(0).MaxOccupationTicks;
 			System.out.printf("\n\nfantasbee : bee 1 ticks in\n\n", ticksInBeeOne);
