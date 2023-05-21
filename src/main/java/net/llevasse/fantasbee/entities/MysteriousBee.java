@@ -809,9 +809,9 @@ public class MysteriousBee extends Animal implements NeutralMob, FlyingAnimal {
 		}
 
 		public void start() {
-			System.out.print("\n\nfantasbee : I want to enter my hive! \n\n");
 			BlockEntity blockentity = MysteriousBee.this.level.getBlockEntity(MysteriousBee.this.hivePos);
 			if (blockentity instanceof MysteriousBeehiveBlockEntity block) {
+				System.out.print("\n\nfantasbee : I want to enter my hive! \n\n");
 				block.addOccupant(MysteriousBee.this, MysteriousBee.this.hasNectar());
 			}
 

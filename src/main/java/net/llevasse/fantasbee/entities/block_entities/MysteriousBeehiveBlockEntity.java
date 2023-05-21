@@ -109,10 +109,10 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 	public static boolean CanHiveAcceptBee(Level lvl, BlockPos pos, Item BeeProduct) {
 		BlockEntity entity = lvl.getBlockEntity(pos);
 		if (entity instanceof MysteriousBeehiveBlockEntity beehiveBlockEntity) {
-			if (!beehiveBlockEntity.product.get(0).getItem().equals(BeeProduct)) {
-				if (!beehiveBlockEntity.product.get(0).getItem().equals(Items.AIR))
-					return false;
-			}
+			if (!beehiveBlockEntity.product.get(0).getItem().equals(Items.AIR)) 
+				return false;
+			if (beehiveBlockEntity.product.get(0).getItem().equals(Items.AIR))
+				return true;
 			if (beehiveBlockEntity.stored.isEmpty() || beehiveBlockEntity.stored.size() < 3)
 				return true;
 		}
@@ -241,7 +241,7 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 			entity.ejectPassengers();
 			CompoundTag compoundtag = new CompoundTag();
 			entity.save(compoundtag);
-			this.storeBee(compoundtag, ticksInHive, hasNectar);
+			this.storeBee(compoundtag, ticksInHive, hasNectar, hasNectar);
 			if (this.level != null) {
 				if (entity instanceof MysteriousBee) {
 					MysteriousBee bee = (MysteriousBee) entity;
