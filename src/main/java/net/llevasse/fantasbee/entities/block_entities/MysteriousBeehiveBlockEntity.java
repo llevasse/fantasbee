@@ -45,9 +45,6 @@ import net.minecraft.world.level.gameevent.GameEvent;
 public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 	protected NonNullList<ItemStack> product = NonNullList.withSize(1, ItemStack.EMPTY);
 	private final List<MysteriousBeehiveBlockEntity.BeeData> stored = Lists.newArrayList();
-	public static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(MysteriousBee.class,
-			EntityDataSerializers.ITEM_STACK);
-
 	public static final String TAG_FLOWER_POS = "FlowerPos";
 	public static final String TAG_PRODUCT = "Product";
 	public static final String MIN_OCCUPATION_TICKS = "MinOccupationTicks";
@@ -80,7 +77,7 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 			this.savedFlowerPos = NbtUtils.readBlockPos(nbt.getCompound("FlowerPos"));
 		}
 		if (nbt.contains("Product")){
-			CompoundTag tag = nbt.get("Product");
+			CompoundTag tag = nbt.getCompound("Product");
 			ItemStack item = ItemStack.of(tag);
 			this.product.set(0, new ItemStack(item.getItem()));
 		}
@@ -107,7 +104,6 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		if (!this.product.get(0).getItem().equals(Items.AIR)) {
 			nbt.put("Product", product.get(0).save(new CompoundTag()));
 		}
-
 	}
 
 	public static boolean CanHiveAcceptBee(Level lvl, BlockPos pos, Item BeeProduct) {

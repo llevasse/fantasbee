@@ -80,9 +80,12 @@ public class suspecious_beehive_block extends Block implements EntityBlock {
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		} else if (item == Items.AIR) {
 			BlockEntity entity = lvl.getBlockEntity(pos);
-			if (entity instanceof MysteriousBeehiveBlockEntity blockEntity)
-				System.out.printf("\n\nfantasbee :This hive produce %s\n\n",
+			if (entity instanceof MysteriousBeehiveBlockEntity blockEntity){
+				System.out.printf("\n\nfantasbee : This hive produce %s\n\n",
 						blockEntity.getProduct().getClass().getName());
+				System.out.printf("\n\nfantasbee : This hive countains %d bees\n\n",
+						blockEntity.getOccupantCount());
+			}
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		}
 		return InteractionResult.FAIL;
