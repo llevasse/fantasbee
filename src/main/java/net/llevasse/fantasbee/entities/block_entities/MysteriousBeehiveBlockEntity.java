@@ -16,9 +16,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.protocol.game.DebugPackets;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -43,7 +40,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
-	protected NonNullList<ItemStack> product = NonNullList.withSize(1, ItemStack.EMPTY);
+	//protected NonNullList<ItemStack> product = NonNullList.withSize(1, ItemStack.EMPTY);
+	protected ItemStack product = ItemStack.EMPTY;
 	private final List<MysteriousBeehiveBlockEntity.BeeData> stored = Lists.newArrayList();
 	public static final String TAG_FLOWER_POS = "FlowerPos";
 	public static final String TAG_PRODUCT = "Product";
@@ -64,13 +62,15 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 
 	public MysteriousBeehiveBlockEntity(BlockPos pos, BlockState state) {
 		super(pos, state);
-		product.set(0, new ItemStack(Items.AIR));
+		product = new ItemStack(Items.AIR);
+		// product.set(0, new ItemStack(Items.AIR));
 	}
 
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
-		this.product = NonNullList.withSize(1, ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(nbt, product);
+		this.product = ItemStack.EMPTY;
+		// this.product = NonNullList.withSize(1, ItemStack.EMPTY);
+		//ContainerHelper.loadAllItems(nbt, product);
 		
 		this.savedFlowerPos = null;
 		if (nbt.contains("FlowerPos")) {
@@ -79,39 +79,53 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 		if (nbt.contains("Product")){
 			CompoundTag tag = nbt.getCompound("Product");
 			ItemStack item = ItemStack.of(tag);
-			this.product.set(0, new ItemStack(item.getItem()));
+			this.product = item;
+			// this.product.set(0, new ItemStack(item.getItem()));
 		}
 
 	}
 
 	public void setProduct(MysteriousBee bee) {
-		this.product.set(0, new ItemStack(bee.getProduct()));
+		this.product = new ItemStack(bee.getProduct());
+		// this.product.set(0, new ItemStack(bee.getProduct()));
+		// System.out.printf("\n\nfantasbee : new product : %s\n\n",
+		// this.product.get(0).getItem().getName(this.product.get(0)).getString());
 		System.out.printf("\n\nfantasbee : new product : %s\n\n",
-				this.product.get(0).getItem().getName(this.product.get(0)).getString());
+			this.product.getItem().getName(this.product));
 	}
 
 	public ItemLike getProduct() {
-		return this.product.get(0).getItem();
+		return this.product.getItem();
+		// return this.product.get(0).getItem();
 	}
 
 	protected void saveAdditional(CompoundTag nbt) {
 		super.saveAdditional(nbt);
-		ContainerHelper.saveAllItems(nbt, product);
+		//ContainerHelper.saveAllItems(nbt, product);
 		nbt.put("Bees", this.writeBees());
 		if (this.hasSavedFlowerPos()) {
 			nbt.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
 		}
-		if (!this.product.get(0).getItem().equals(Items.AIR)) {
-			nbt.put("Product", product.get(0).save(new CompoundTag()));
+		// if (!this.product.get(0).getItem().equals(Items.AIR)) {
+		// 	System.out.print("\n\nfantasbee : saving beehive\n\n");
+		// 	nbt.put("Product", product.get(0).save(new CompoundTag()));
+		// }
+		if (!this.product.getItem().equals(Items.AIR)) {
+			System.out.print("\n\nfantasbee : saving beehive\n\n");
+			nbt.put("Product", this.product.save(new CompoundTag()));
 		}
 	}
 
 	public static boolean CanHiveAcceptBee(Level lvl, BlockPos pos, Item BeeProduct) {
 		BlockEntity entity = lvl.getBlockEntity(pos);
 		if (entity instanceof MysteriousBeehiveBlockEntity beehiveBlockEntity) {
-			if (!beehiveBlockEntity.product.get(0).getItem().equals(Items.AIR)) 
+			// if (!beehiveBlockEntity.product.get(0).getItem().equals(Items.AIR))
+			// 	return false;
+			if (!beehiveBlockEntity.product.getItem().equals(Items.AIR))
 				return false;
-			if (beehiveBlockEntity.product.get(0).getItem().equals(Items.AIR))
+			// if (beehiveBlockEntity.product.get(0).getItem().equals(Items.AIR))
+			// 	return true;
+			if (beehiveBlockEntity.product.getItem().equals(Items.AIR))
 				return true;
 			if (beehiveBlockEntity.stored.isEmpty() || beehiveBlockEntity.stored.size() < 3)
 				return true;
@@ -216,7 +230,9 @@ public class MysteriousBeehiveBlockEntity extends BeehiveBlockEntity {
 	}
 
 	public void addOccupant(Entity entity, boolean hasNectar) {
-		if (this.product.get(0).getItem().equals(Items.AIR))
+		// if (this.product.get(0).getItem().equals(Items.AIR))
+		// 	this.setProduct((MysteriousBee) entity);
+		if (this.product.getItem().equals(Items.AIR))
 			this.setProduct((MysteriousBee) entity);
 		this.addOccupantWithPresetTicks(entity, hasNectar, 0);
 	}

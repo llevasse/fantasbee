@@ -75,7 +75,7 @@ public class suspecious_beehive_block extends Block implements EntityBlock {
 		int i = state.getValue(LEVEL_HONEY);
 		Item item = handItem.getItem();
 		//System.out.printf("\n\nfantasbee : %s used\n\n", item.getName(handItem).toString());
-		if (item == Items.DIAMOND_AXE && i >= 5) {
+		if (item == Items.DIAMOND_AXE) {
 			dropProduct(lvl, pos);
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		} else if (item == Items.AIR) {
