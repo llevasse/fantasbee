@@ -59,14 +59,16 @@ public class suspecious_beehive_block extends Block implements EntityBlock {
 		BlockEntity entity = lvl.getBlockEntity(pos);
 		if (entity instanceof MysteriousBeehiveBlockEntity blockEntity) {
 			popResource(lvl, pos, new ItemStack(blockEntity.getProduct(), 1));
+			blockEntity.ItemProduced++;
 		}
 	}
 
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level lvl, BlockState state, BlockEntityType<T> type) {
-      return type == ModBlockEntities.MYSTERIOUS_BEEHIVE_BLOCK_ENTITY.get() ? (level, pos, blockstate, entity) -> {
-		if (entity instanceof MysteriousBeehiveBlockEntity mysterious_beehive_block)
-			mysterious_beehive_block.serverTick(lvl, pos, state, mysterious_beehive_block);
-      } : null;
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level lvl, BlockState state,
+			BlockEntityType<T> type) {
+		return type == ModBlockEntities.MYSTERIOUS_BEEHIVE_BLOCK_ENTITY.get() ? (level, pos, blockstate, entity) -> {
+			if (entity instanceof MysteriousBeehiveBlockEntity mysterious_beehive_block)
+				mysterious_beehive_block.serverTick(lvl, pos, state, mysterious_beehive_block);
+		} : null;
 	}
 
 	public InteractionResult use(BlockState state, Level lvl, BlockPos pos, Player player,
@@ -74,17 +76,19 @@ public class suspecious_beehive_block extends Block implements EntityBlock {
 		ItemStack handItem = player.getItemInHand(hand);
 		int i = state.getValue(LEVEL_HONEY);
 		Item item = handItem.getItem();
-		//System.out.printf("\n\nfantasbee : %s used\n\n", item.getName(handItem).toString());
+		// System.out.printf("\n\nfantasbee : %s used\n\n",
+		// item.getName(handItem).toString());
 		if (item == Items.DIAMOND_AXE) {
 			dropProduct(lvl, pos);
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		} else if (item == Items.AIR) {
 			BlockEntity entity = lvl.getBlockEntity(pos);
-			if (entity instanceof MysteriousBeehiveBlockEntity blockEntity){
+			if (entity instanceof MysteriousBeehiveBlockEntity blockEntity) {
 				System.out.printf("\n\nfantasbee : This hive produce %s\n\n",
 						blockEntity.getProduct().getClass().getName());
 				System.out.printf("\n\nfantasbee : This hive countains %d bees\n\n",
 						blockEntity.getOccupantCount());
+				System.out.printf("\n\nfantasbee : this hive produced %d times\n\n", blockEntity.ItemProduced);
 			}
 			return InteractionResult.sidedSuccess(lvl.isClientSide);
 		}

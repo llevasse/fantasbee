@@ -14,7 +14,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.protocol.game.DebugPackets;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -22,7 +21,6 @@ import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.VisibleForDebug;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +30,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -55,12 +52,14 @@ public class MysteriousBeehiveBlockEntity extends BlockEntity {
 			"Passengers", "Leash", "UUID");
 	public static final int MAX_OCCUPANTS = 3;
 	public static final int MIN_OCCUPATION_TICKS_NECTARLESS = 20;
+	public int ItemProduced;
 	@Nullable
 	private BlockPos savedFlowerPos;
 
 	public MysteriousBeehiveBlockEntity(BlockPos pos, BlockState state) {
 		super(BlockEntityType.BEEHIVE, pos, state);
 		product = new ItemStack(Items.AIR);
+		ItemProduced = 0;
 	}
 
 	
@@ -155,8 +154,8 @@ public class MysteriousBeehiveBlockEntity extends BlockEntity {
 		List<Entity> list = this.releaseAllOccupants(state, ReleaseStatus);
 		if (player != null) {
 			for (Entity entity : list) {
-				if (entity instanceof Bee) {
-					Bee bee = (Bee) entity;
+				if (entity instanceof MysteriousBee) {
+					MysteriousBee bee = (MysteriousBee) entity;
 					if (player.position().distanceToSqr(entity.position()) <= 16.0D) {
 						if (!this.isSedated()) {
 							bee.setTarget(player);
@@ -386,6 +385,7 @@ public class MysteriousBeehiveBlockEntity extends BlockEntity {
 	public void saveAdditional(CompoundTag nbt) {
 		super.saveAdditional(nbt);
 		nbt.put("Bees", this.writeBees());
+		nbt.putInt("NbProduced", ItemProduced);
 		if (this.hasSavedFlowerPos()) {
 			nbt.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
 		}
@@ -398,20 +398,19 @@ public class MysteriousBeehiveBlockEntity extends BlockEntity {
 
 	@Override
 	public void load(CompoundTag nbt) {
-		super.load(nbt);
-		System.out.print("\n\nLoading beehive\n\n");
-
+		System.out.print("\n\nfantasbee : Loading beehive\n\n");
+		
 		this.product = ItemStack.EMPTY;
 		this.savedFlowerPos = null;
-
+		this.ItemProduced = nbt.getInt("NbProduced");
 		this.stored.clear();
 		ListTag listtag = nbt.getList("Bees", 10);
 
 		for (int i = 0; i < listtag.size(); ++i) {
 			CompoundTag compoundtag = listtag.getCompound(i);
 			MysteriousBeehiveBlockEntity.BeeData beedata = new MysteriousBeehiveBlockEntity.BeeData(
-					compoundtag.getCompound("EntityData"), compoundtag.getInt("TicksInHive"),
-					compoundtag.getInt("MinOccupationTicks"), compoundtag.getInt("MaxOccupationTicks"));
+				compoundtag.getCompound("EntityData"), compoundtag.getInt("TicksInHive"),
+				compoundtag.getInt("MinOccupationTicks"), compoundtag.getInt("MaxOccupationTicks"));
 			this.stored.add(beedata);
 		}
 		if (nbt.contains("FlowerPos")) {
@@ -422,6 +421,7 @@ public class MysteriousBeehiveBlockEntity extends BlockEntity {
 			ItemStack item = ItemStack.of(tag);
 			this.product = item;
 		}
+		super.load(nbt);
 	}
 
 	public enum BeeReleaseStatus {

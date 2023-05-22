@@ -59,6 +59,36 @@
 		"honey_level=3,facing=east": {
 			"model": "fantasbee:block/suspecious_beehive_block",
 			"y": 90
+		},
+		"honey_level=4,facing=north": {
+			"model": "fantasbee:block/suspecious_beehive_block"
+		},
+		"honey_level=4,facing=south": {
+			"model": "fantasbee:block/suspecious_beehive_block",
+			"y": 180
+		},
+		"honey_level=4,facing=west": {
+			"model": "fantasbee:block/suspecious_beehive_block",
+			"y": 270
+		},
+		"honey_level=4,facing=east": {
+			"model": "fantasbee:block/suspecious_beehive_block",
+			"y": 90
+		},
+		"honey_level=5,facing=north": {
+			"model": "fantasbee:block/suspecious_beehive_block"
+		},
+		"honey_level=5,facing=south": {
+			"model": "fantasbee:block/suspecious_beehive_block",
+			"y": 180
+		},
+		"honey_level=5,facing=west": {
+			"model": "fantasbee:block/suspecious_beehive_block",
+			"y": 270
+		},
+		"honey_level=5,facing=east": {
+			"model": "fantasbee:block/suspecious_beehive_block",
+			"y": 90
 		}
 	}
 } 
