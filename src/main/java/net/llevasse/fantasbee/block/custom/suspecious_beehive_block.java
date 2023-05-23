@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -36,7 +37,12 @@ public class suspecious_beehive_block extends Block implements EntityBlock {
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return ModBlockEntities.MYSTERIOUS_BEEHIVE_BLOCK_ENTITY.get().create(pos, state);
+		return new MysteriousBeehiveBlockEntity(pos, state);
+	}
+	
+	@Override
+	public RenderShape getRenderShape(BlockState p_60550_) {
+		return RenderShape.MODEL;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -84,6 +90,7 @@ public class suspecious_beehive_block extends Block implements EntityBlock {
 		} else if (item == Items.AIR) {
 			BlockEntity entity = lvl.getBlockEntity(pos);
 			if (entity instanceof MysteriousBeehiveBlockEntity blockEntity) {
+				blockEntity.setChanged();
 				System.out.printf("\n\nfantasbee : This hive produce %s\n\n",
 						blockEntity.getProduct().getClass().getName());
 				System.out.printf("\n\nfantasbee : This hive countains %d bees\n\n",

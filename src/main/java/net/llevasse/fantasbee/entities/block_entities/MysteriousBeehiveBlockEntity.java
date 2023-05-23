@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.google.common.collect.Lists;
 
 import net.llevasse.fantasbee.entities.MysteriousBee;
@@ -34,9 +36,22 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class MysteriousBeehiveBlockEntity extends BlockEntity {
 	protected ItemStack product = ItemStack.EMPTY;
+	private final ItemStackHandler itemHandler = new ItemStackHandler(3) {
+		@Override
+		protected void onContentsChanged(int slot){
+			setChanged();
+		}
+	};
+	private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 	private final List<MysteriousBeehiveBlockEntity.BeeData> stored = Lists.newArrayList();
 	public static final String TAG_FLOWER_POS = "FlowerPos";
 	public static final String TAG_PRODUCT = "Product";
@@ -63,10 +78,80 @@ public class MysteriousBeehiveBlockEntity extends BlockEntity {
 	}
 
 	
+	@Override
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap,
+			@org.jetbrains.annotations.Nullable Direction side) {
+		if (cap == ForgeCapabilities.ITEM_HANDLER){
+			return lazyItemHandler.cast();
+		}
+		
+		return super.getCapability(cap, side);
+	}
+	
+	@Override
+	public void onLoad() {
+		super.onLoad();
+		lazyItemHandler = LazyOptional.of(() -> itemHandler);
+	}
+	
+	@Override
+	public void invalidateCaps() {
+		super.invalidateCaps();
+		lazyItemHandler.invalidate();
+	}
+	
+	@Override
+	public void saveAdditional(CompoundTag nbt) {
+		System.out.print("\n\nfantasbee beehive : start saving beehive\n\n");
+		nbt.put("inventory", itemHandler.serializeNBT());
+		
+		nbt.put("Bees", this.writeBees());
+		nbt.putInt("NbProduced", ItemProduced);
+		if (this.hasSavedFlowerPos()) {
+			nbt.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
+		}
+		// if (!this.product.getItem().equals(Items.AIR)) {
+			// 	System.out.print("\n\nfantasbee : saving beehive\n\n");
+			// 	nbt.put("Product", this.product.save(new CompoundTag()));
+			// }
+		System.out.print("\n\nfantasbee beehive : done saving beehive\n\n");
+		super.saveAdditional(nbt);
+	}
+	
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
+		System.out.print("\n\nfantasbee beehive : start loading beehive\n\n");
+
+		itemHandler.deserializeNBT(nbt.getCompound("inventory"));
+		this.product = ItemStack.EMPTY;
+		this.savedFlowerPos = null;
+		this.ItemProduced = nbt.getInt("NbProduced");
+		this.stored.clear();
+		ListTag listtag = nbt.getList("Bees", 10);
+
+		for (int i = 0; i < listtag.size(); ++i) {
+			CompoundTag compoundtag = listtag.getCompound(i);
+			MysteriousBeehiveBlockEntity.BeeData beedata = new MysteriousBeehiveBlockEntity.BeeData(
+					compoundtag.getCompound("EntityData"), compoundtag.getInt("TicksInHive"),
+					compoundtag.getInt("MinOccupationTicks"), compoundtag.getInt("MaxOccupationTicks"));
+			this.stored.add(beedata);
+		}
+		if (nbt.contains("FlowerPos")) {
+			this.savedFlowerPos = NbtUtils.readBlockPos(nbt.getCompound("FlowerPos"));
+		}
+		if (nbt.contains("Product")) {
+			CompoundTag tag = nbt.getCompound("Product");
+			ItemStack item = ItemStack.of(tag);
+			this.product = item;
+		}
+		System.out.print("\n\nfantasbee beehive : done loading beehive\n\n");
+	}
+	
 	public void setProduct(MysteriousBee bee) {
 		this.product = new ItemStack(bee.getProduct());
 		System.out.printf("\n\nfantasbee : new product : %s\n\n",
 		this.product.getItem().getName(this.product));
+		setChanged();
 	}
 	
 	public ItemLike getProduct() {
@@ -118,6 +203,7 @@ public class MysteriousBeehiveBlockEntity extends BlockEntity {
 	}
 
 	public void setChanged() {
+		System.out.print("\n\nfantasbee : setChanged() called\n\n");
 		if (this.isFireNearby()) {
 			this.emptyAllLivingFromHive((Player) null, this.level.getBlockState(this.getBlockPos()),
 					MysteriousBeehiveBlockEntity.BeeReleaseStatus.EMERGENCY);
@@ -381,48 +467,6 @@ public class MysteriousBeehiveBlockEntity extends BlockEntity {
 		//DebugPackets.sendHiveInfo(lvl, pos, state, BlockEntity);
 	}
 
-	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
-		nbt.put("Bees", this.writeBees());
-		nbt.putInt("NbProduced", ItemProduced);
-		if (this.hasSavedFlowerPos()) {
-			nbt.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
-		}
-		if (!this.product.getItem().equals(Items.AIR)) {
-			System.out.print("\n\nfantasbee : saving beehive\n\n");
-			nbt.put("Product", this.product.save(new CompoundTag()));
-		}
-		System.out.print("\n\nfantasbee.beehive : done saving beehive\n\n");
-	}
-
-	@Override
-	public void load(CompoundTag nbt) {
-		System.out.print("\n\nfantasbee : Loading beehive\n\n");
-		
-		this.product = ItemStack.EMPTY;
-		this.savedFlowerPos = null;
-		this.ItemProduced = nbt.getInt("NbProduced");
-		this.stored.clear();
-		ListTag listtag = nbt.getList("Bees", 10);
-
-		for (int i = 0; i < listtag.size(); ++i) {
-			CompoundTag compoundtag = listtag.getCompound(i);
-			MysteriousBeehiveBlockEntity.BeeData beedata = new MysteriousBeehiveBlockEntity.BeeData(
-				compoundtag.getCompound("EntityData"), compoundtag.getInt("TicksInHive"),
-				compoundtag.getInt("MinOccupationTicks"), compoundtag.getInt("MaxOccupationTicks"));
-			this.stored.add(beedata);
-		}
-		if (nbt.contains("FlowerPos")) {
-			this.savedFlowerPos = NbtUtils.readBlockPos(nbt.getCompound("FlowerPos"));
-		}
-		if (nbt.contains("Product")) {
-			CompoundTag tag = nbt.getCompound("Product");
-			ItemStack item = ItemStack.of(tag);
-			this.product = item;
-		}
-		super.load(nbt);
-	}
 
 	public enum BeeReleaseStatus {
 		HONEY_DELIVERED,
