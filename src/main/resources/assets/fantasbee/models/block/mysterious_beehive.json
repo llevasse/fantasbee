@@ -1,6 +1,6 @@
 {
   "parent": "block/cube_all",
-  "texture": {
+  "textures": {
     "all": "fantasbee:block/mysterious_beehive"
   }
 }
