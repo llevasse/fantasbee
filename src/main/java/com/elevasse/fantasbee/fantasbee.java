@@ -1,6 +1,7 @@
 package com.elevasse.fantasbee;
 
 import com.elevasse.fantasbee.block.RefBlocks;
+import com.elevasse.fantasbee.blockEntity.RefBlockEntity;
 import com.elevasse.fantasbee.entity.RefEntities;
 import com.elevasse.fantasbee.item.RefItems;
 import com.mojang.logging.LogUtils;
@@ -36,6 +37,7 @@ public class fantasbee
         RefBlocks.register(modEventBus);
         RefItems.register(modEventBus);
         RefEntities.register(modEventBus);
+        RefBlockEntity.register(modEventBus);
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
