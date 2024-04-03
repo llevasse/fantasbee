@@ -4,6 +4,7 @@ import com.elevasse.fantasbee.blockEntity.MysteriousBeehiveEntity;
 import com.elevasse.fantasbee.blockEntity.RefBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -13,10 +14,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class MysteriousBeehive extends Block implements EntityBlock {
+    public static Property<Integer> HONEY_LEVEL;
+    public static Property<Direction> FACING;
+
     public MysteriousBeehive(Properties properties) {
         super(properties);
     }
