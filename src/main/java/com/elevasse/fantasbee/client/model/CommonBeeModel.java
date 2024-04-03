@@ -1,5 +1,6 @@
 package com.elevasse.fantasbee.client.model;
 
+import com.elevasse.fantasbee.entity.CommonBee;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.ModelUtils;
@@ -18,7 +19,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public class CommonBeeModel<T extends Bee> extends AgeableListModel<T> {
+public class CommonBeeModel<T extends CommonBee> extends AgeableListModel<T> {
    private static final float BEE_Y_BASE = 19.0F;
    private static final String BONE = "bone";
    private static final String STINGER = "stinger";

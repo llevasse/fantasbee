@@ -28,13 +28,11 @@ public class MysteriousBeehive extends Block implements EntityBlock {
 
     @Override
     public InteractionResult use(BlockState blockstate, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
-        System.out.println("CC from use");
         if (!level.isClientSide()) {
             BlockEntity entity = level.getBlockEntity(pos);
             if (entity instanceof MysteriousBeehiveEntity) {
                 if (hand == InteractionHand.MAIN_HAND) {
                     ((MysteriousBeehiveEntity) entity).increase();
-                    System.out.println(((MysteriousBeehiveEntity) entity).getTestNbt());
                     return InteractionResult.SUCCESS;
                 }
             }

@@ -46,14 +46,12 @@ public class MysteriousBeehiveEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         tag.putInt("testNbt", this.testNbt);
         super.saveAdditional(tag);
-        System.out.println("Saving");
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         this.testNbt = tag.getInt("testNbt");
-        System.out.println("Loading");
     }
 
    public static final String TAG_FLOWER_POS = "FlowerPos";

@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Bee;
+import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 
@@ -100,7 +101,7 @@ import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidType;
 
-public class CommonBee extends Bee {
+public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
     public CommonBee(EntityType<CommonBee> type, Level level) {
         super(type, level);
 
@@ -460,7 +461,6 @@ public class CommonBee extends Bee {
 
    protected void sendDebugPackets() {
       super.sendDebugPackets();
-      DebugPackets.sendBeeInfo(this);
    }
 
    int getCropsGrownSincePollination() {
@@ -999,6 +999,7 @@ public class CommonBee extends Bee {
             for(BlockPos blockpos : list) {
                if (!CommonBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
                   CommonBee.this.hivePos = blockpos;
+                  System.out.printf("found at : %d,%d,%d", blockpos.getX(), blockpos.getY(), blockpos.getZ());
                   return;
                }
             }
