@@ -15,11 +15,8 @@ import net.minecraft.world.level.LevelAccessor;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -101,12 +98,14 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fluids.FluidType;
+
 public class CommonBee extends Bee {
     public CommonBee(EntityType<CommonBee> type, Level level) {
         super(type, level);
 
         this.moveControl = new FlyingMoveControl(this, 20, true);
-        this.lookControl = new CommonBee.BeeLookControl(this);
+        this.lookControl = new BeeLookControl(this);
         this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, 16.0F);
@@ -174,9 +173,9 @@ public class CommonBee extends Bee {
    BlockPos savedFlowerPos;
    @Nullable
    BlockPos hivePos;
-   CommonBee.BeePollinateGoal beePollinateGoal;
-   CommonBee.BeeGoToHiveGoal goToHiveGoal;
-   private CommonBee.BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
+   BeePollinateGoal beePollinateGoal;
+   BeeGoToHiveGoal goToHiveGoal;
+   private BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
    private int underWaterTicks;
 
    protected void defineSynchedData() {
@@ -191,25 +190,25 @@ public class CommonBee extends Bee {
 
    @Override
    protected void registerGoals() {
-      this.goalSelector.addGoal(0, new CommonBee.BeeAttackGoal(this, (double)1.4F, true));
-      this.goalSelector.addGoal(1, new CommonBee.BeeEnterHiveGoal());
+      super.registerGoals();
+      this.goalSelector.addGoal(0, new BeeAttackGoal(this, (double)1.4F, true));
+      this.goalSelector.addGoal(1, new BeeEnterHiveGoal());
       this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D));
       this.goalSelector.addGoal(3, new TemptGoal(this, 1.25D, Ingredient.of(ItemTags.FLOWERS), false));
-      this.beePollinateGoal = new CommonBee.BeePollinateGoal();
+      this.beePollinateGoal = new BeePollinateGoal();
       this.goalSelector.addGoal(4, this.beePollinateGoal);
       this.goalSelector.addGoal(5, new FollowParentGoal(this, 1.25D));
-      this.goalSelector.addGoal(5, new CommonBee.BeeLocateHiveGoal());
-      this.goToHiveGoal = new CommonBee.BeeGoToHiveGoal();
+      this.goalSelector.addGoal(5, new BeeLocateHiveGoal());
+      this.goToHiveGoal = new BeeGoToHiveGoal();
       this.goalSelector.addGoal(5, this.goToHiveGoal);
-      this.goToKnownFlowerGoal = new CommonBee.BeeGoToKnownFlowerGoal();
+      this.goToKnownFlowerGoal = new BeeGoToKnownFlowerGoal();
       this.goalSelector.addGoal(6, this.goToKnownFlowerGoal);
-      this.goalSelector.addGoal(7, new CommonBee.BeeGrowCropGoal());
-      this.goalSelector.addGoal(8, new CommonBee.BeeWanderGoal());
+      this.goalSelector.addGoal(7, new BeeGrowCropGoal());
+      this.goalSelector.addGoal(8, new BeeWanderGoal());
       this.goalSelector.addGoal(9, new FloatGoal(this));
-      this.targetSelector.addGoal(1, (new CommonBee.BeeHurtByOtherGoal(this)).setAlertOthers(new Class[0]));
-      this.targetSelector.addGoal(2, new CommonBee.BeeBecomeAngryTargetGoal(this));
+      this.targetSelector.addGoal(1, (new BeeHurtByOtherGoal(this)).setAlertOthers(new Class[0]));
+      this.targetSelector.addGoal(2, new BeeBecomeAngryTargetGoal(this));
       this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, true));
-      //super.registerGoals();
    }
    
    public void addAdditionalSaveData(CompoundTag p_27823_) {
@@ -651,7 +650,7 @@ public class CommonBee extends Bee {
    }
 
    @Override
-   public void jumpInFluid(net.minecraftforge.fluids.FluidType type) {
+   public void jumpInFluid(FluidType type) {
       this.jumpInLiquidInternal();
    }
 
@@ -716,7 +715,7 @@ public class CommonBee extends Bee {
       }
    }
 
-   class BeeEnterHiveGoal extends CommonBee.BaseBeeGoal {
+   class BeeEnterHiveGoal extends BaseBeeGoal {
       public boolean canBeeUse() {
          if (CommonBee.this.hasHive() && CommonBee.this.wantsToEnterHive() && CommonBee.this.hivePos.closerToCenterThan(CommonBee.this.position(), 2.0D)) {
             BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
@@ -747,7 +746,7 @@ public class CommonBee extends Bee {
    }
 
    @VisibleForDebug
-   public class BeeGoToHiveGoal extends CommonBee.BaseBeeGoal {
+   public class BeeGoToHiveGoal extends BaseBeeGoal {
       public static final int MAX_TRAVELLING_TICKS = 600;
       int travellingTicks = CommonBee.this.level.random.nextInt(10);
       private static final int MAX_BLACKLISTED_TARGETS = 3;
@@ -758,7 +757,7 @@ public class CommonBee extends Bee {
       private int ticksStuck;
 
       BeeGoToHiveGoal() {
-         this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+         this.setFlags(EnumSet.of(Flag.MOVE));
       }
 
       public boolean canBeeUse() {
@@ -859,12 +858,12 @@ public class CommonBee extends Bee {
       }
    }
 
-   public class BeeGoToKnownFlowerGoal extends CommonBee.BaseBeeGoal {
+   public class BeeGoToKnownFlowerGoal extends BaseBeeGoal {
       private static final int MAX_TRAVELLING_TICKS = 600;
       int travellingTicks = CommonBee.this.level.random.nextInt(10);
 
       BeeGoToKnownFlowerGoal() {
-         this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+         this.setFlags(EnumSet.of(Flag.MOVE));
       }
 
       public boolean canBeeUse() {
@@ -906,7 +905,7 @@ public class CommonBee extends Bee {
       }
    }
 
-   class BeeGrowCropGoal extends CommonBee.BaseBeeGoal {
+   class BeeGrowCropGoal extends BaseBeeGoal {
       static final int GROW_CHANCE = 30;
 
       public boolean canBeeUse() {
@@ -983,7 +982,7 @@ public class CommonBee extends Bee {
       }
    }
 
-   class BeeLocateHiveGoal extends CommonBee.BaseBeeGoal {
+   class BeeLocateHiveGoal extends BaseBeeGoal {
       public boolean canBeeUse() {
          return CommonBee.this.remainingCooldownBeforeLocatingNewHive == 0 && !CommonBee.this.hasHive() && CommonBee.this.wantsToEnterHive();
       }
@@ -995,6 +994,7 @@ public class CommonBee extends Bee {
       public void start() {
          CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
          List<BlockPos> list = this.findNearbyHivesWithSpace();
+         System.out.println("Searching a hive");
          if (!list.isEmpty()) {
             for(BlockPos blockpos : list) {
                if (!CommonBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
@@ -1006,17 +1006,24 @@ public class CommonBee extends Bee {
             CommonBee.this.goToHiveGoal.clearBlacklist();
             CommonBee.this.hivePos = list.get(0);
          }
+         else
+            System.out.println("None found");
       }
 
       private List<BlockPos> findNearbyHivesWithSpace() {
          BlockPos blockpos = CommonBee.this.blockPosition();
-         PoiManager poimanager = ((ServerLevel)CommonBee.this.level).getPoiManager();
-         Stream<PoiRecord> stream = poimanager.getInRange((p_218130_) -> {
-            return p_218130_.is(PoiTypeTags.BEE_HOME);
-         }, blockpos, 20, PoiManager.Occupancy.ANY);
-         return stream.map(PoiRecord::getPos).filter(CommonBee.this::doesHiveHaveSpace).sorted(Comparator.comparingDouble((p_148811_) -> {
-            return p_148811_.distSqr(blockpos);
-         })).collect(Collectors.toList());
+         List<BlockPos> list = new ArrayList<>();
+         int   range = 8;
+         int   x = blockpos.getX() - range, y = blockpos.getY() - range, z = blockpos.getZ() - range;
+         for (int checkX = x; checkX <= x + (range * 2) + 1; checkX++){
+            for (int checkY = y; checkY <= y + (range * 2) + 1; checkY++){
+               for (int checkZ = z; checkZ <= z + (range * 2) + 1; checkZ++){
+                  if (doesHiveHaveSpace(new BlockPos(checkX, checkY, checkZ)))
+                     list.add(new BlockPos(checkX, checkY, checkZ));
+               }
+            }
+         }
+         return list;
       }
    }
 
@@ -1036,7 +1043,7 @@ public class CommonBee extends Bee {
       }
    }
 
-   class BeePollinateGoal extends CommonBee.BaseBeeGoal {
+   class BeePollinateGoal extends BaseBeeGoal {
       private static final int MIN_POLLINATION_TICKS = 400;
       private static final int MIN_FIND_FLOWER_RETRY_COOLDOWN = 20;
       private static final int MAX_FIND_FLOWER_RETRY_COOLDOWN = 60;
@@ -1067,7 +1074,7 @@ public class CommonBee extends Bee {
       private static final int MAX_POLLINATING_TICKS = 600;
 
       BeePollinateGoal() {
-         this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+         this.setFlags(EnumSet.of(Flag.MOVE));
       }
 
       public boolean canBeeUse() {
@@ -1224,7 +1231,7 @@ public class CommonBee extends Bee {
       private static final int WANDER_THRESHOLD = 22;
 
       BeeWanderGoal() {
-         this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+         this.setFlags(EnumSet.of(Flag.MOVE));
       }
 
       public boolean canUse() {
