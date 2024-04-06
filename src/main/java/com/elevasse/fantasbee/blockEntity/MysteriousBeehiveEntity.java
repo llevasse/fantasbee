@@ -184,7 +184,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
    }
 
    public void storeBee(CompoundTag tag, int ticksInHive, boolean minTickOccupation) {
-      this.stored.add(new MysteriousBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 2400 : 600));
+      this.stored.add(new MysteriousBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 800 : 600));
    }
 
    private static boolean releaseOccupant(Level level, BlockPos blockPos, BlockState blockState, MysteriousBeehiveEntity.BeeData beeData, @Nullable List<Entity> entityList, MysteriousBeehiveEntity.BeeReleaseStatus p_155142_, @Nullable BlockPos flowerPos) {
@@ -210,18 +210,12 @@ public class MysteriousBeehiveEntity extends BlockEntity {
                }
                if (p_155142_ == MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED) {
                   bee.dropOffNectar();
-                  if (blockState.is(BlockTags.BEEHIVES, (p_202037_) -> {
-                     return p_202037_.hasProperty(MysteriousBeehive.HONEY_LEVEL);
-                  })) {
-                     int i = getHoneyLevel(blockState);
-                     if (i < 5) {
-                        int j = level.random.nextInt(100) == 0 ? 2 : 1;
-                        if (i + j > 5) {
-                           --j;
-                        }
-
-                        level.setBlockAndUpdate(blockPos, blockState.setValue(MysteriousBeehive.HONEY_LEVEL, Integer.valueOf(i + j)));
-                     }
+                  int i = getHoneyLevel(blockState);
+                  if (i < 5) {
+                      int j = level.random.nextInt(100) == 0 ? 2 : 1;
+                      if (i + j > 5)
+                          --j;
+                      level.setBlockAndUpdate(blockPos, blockState.setValue(MysteriousBeehive.HONEY_LEVEL, Integer.valueOf(i + j)));
                   }
                }
 
