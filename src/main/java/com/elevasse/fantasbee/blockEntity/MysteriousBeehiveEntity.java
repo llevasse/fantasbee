@@ -14,13 +14,21 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import org.apache.commons.lang3.ObjectUtils;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -28,30 +36,31 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MysteriousBeehiveEntity extends BlockEntity {
-
-    int testNbt;
+    int honeyLevel;
+    private ItemStack currentProduction = Items.IRON_INGOT.getDefaultInstance();
+    
     public MysteriousBeehiveEntity(BlockPos pos, BlockState state) {
         super(RefBlockEntity.MYSTERIOUS_BEEHIVE.get(), pos, state);
     }
 
     public void increase(){
-        testNbt++;
+        honeyLevel++;
     }
 
-    public int getTestNbt() {
-        return testNbt;
+    public int gethoneyLevel() {
+        return honeyLevel;
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
-        tag.putInt("testNbt", this.testNbt);
+        tag.putInt("honeyLevel", this.honeyLevel);
         super.saveAdditional(tag);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        this.testNbt = tag.getInt("testNbt");
+        this.honeyLevel = tag.getInt("honeyLevel");
     }
 
    public static final String TAG_FLOWER_POS = "FlowerPos";
@@ -130,8 +139,8 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       return list;
    }
 
-   public void addOccupant(Entity p_58742_, boolean p_58743_) {
-      this.addOccupantWithPresetTicks(p_58742_, p_58743_, 0);
+   public void addOccupant(Entity commonBee, boolean p_58743_) {
+      this.addOccupantWithPresetTicks(commonBee, p_58743_, 0);
    }
 
    public int getOccupantCount() {
@@ -149,16 +158,16 @@ public class MysteriousBeehiveEntity extends BlockEntity {
        return false;
    }
 
-   public void addOccupantWithPresetTicks(Entity p_58745_, boolean p_58746_, int p_58747_) {
+   public void addOccupantWithPresetTicks(Entity commonBee, boolean p_58746_, int tickInHive) {
       if (this.stored.size() < 3) {
-         p_58745_.stopRiding();
-         p_58745_.ejectPassengers();
+         commonBee.stopRiding();
+         commonBee.ejectPassengers();
          CompoundTag compoundtag = new CompoundTag();
-         p_58745_.save(compoundtag);
-         this.storeBee(compoundtag, p_58747_, p_58746_);
+         commonBee.save(compoundtag);
+         this.storeBee(compoundtag, tickInHive, p_58746_);
          if (this.level != null) {
-            if (p_58745_ instanceof CommonBee) {
-               CommonBee bee = (CommonBee)p_58745_;
+            if (commonBee instanceof CommonBee) {
+               CommonBee bee = (CommonBee)commonBee;
                if (bee.hasSavedFlowerPos() && (!this.hasSavedFlowerPos() || this.level.random.nextBoolean())) {
                   this.savedFlowerPos = bee.getSavedFlowerPos();
                }
@@ -166,79 +175,71 @@ public class MysteriousBeehiveEntity extends BlockEntity {
 
             BlockPos blockpos = this.getBlockPos();
             this.level.playSound((Player)null, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), SoundEvents.BEEHIVE_ENTER, SoundSource.BLOCKS, 1.0F, 1.0F);
-            this.level.gameEvent(GameEvent.BLOCK_CHANGE, blockpos, GameEvent.Context.of(p_58745_, this.getBlockState()));
+            this.level.gameEvent(GameEvent.BLOCK_CHANGE, blockpos, GameEvent.Context.of(commonBee, this.getBlockState()));
          }
 
-         p_58745_.discard();
+         commonBee.discard();
          super.setChanged();
       }
    }
 
-   public void storeBee(CompoundTag p_155158_, int p_155159_, boolean p_155160_) {
-      this.stored.add(new MysteriousBeehiveEntity.BeeData(p_155158_, p_155159_, p_155160_ ? 2400 : 600));
+   public void storeBee(CompoundTag tag, int ticksInHive, boolean minTickOccupation) {
+      this.stored.add(new MysteriousBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 2400 : 600));
    }
 
-   private static boolean releaseOccupant(Level p_155137_, BlockPos p_155138_, BlockState p_155139_, MysteriousBeehiveEntity.BeeData p_155140_, @Nullable List<Entity> p_155141_, MysteriousBeehiveEntity.BeeReleaseStatus p_155142_, @Nullable BlockPos p_155143_) {
-      if ((p_155137_.isNight() || p_155137_.isRaining()) && p_155142_ != MysteriousBeehiveEntity.BeeReleaseStatus.EMERGENCY) {
+   private static boolean releaseOccupant(Level level, BlockPos blockPos, BlockState blockState, MysteriousBeehiveEntity.BeeData beeData, @Nullable List<Entity> entityList, MysteriousBeehiveEntity.BeeReleaseStatus p_155142_, @Nullable BlockPos flowerPos) {
+      if ((level.isNight() || level.isRaining()) && p_155142_ != MysteriousBeehiveEntity.BeeReleaseStatus.EMERGENCY) {
          return false;
       } else {
-         CompoundTag compoundtag = p_155140_.entityData.copy();
+         CompoundTag compoundtag = beeData.entityData.copy();
          removeIgnoredBeeTags(compoundtag);
-         compoundtag.put("HivePos", NbtUtils.writeBlockPos(p_155138_));
+         compoundtag.put("HivePos", NbtUtils.writeBlockPos(blockPos));
          compoundtag.putBoolean("NoGravity", true);
-         Direction direction = p_155139_.getValue(MysteriousBeehive.FACING);
-         BlockPos blockpos = p_155138_.relative(direction);
-         boolean flag = !p_155137_.getBlockState(blockpos).getCollisionShape(p_155137_, blockpos).isEmpty();
+         Direction direction = blockState.getValue(MysteriousBeehive.FACING);
+         BlockPos blockpos = blockPos.relative(direction);
+         boolean flag = !level.getBlockState(blockpos).getCollisionShape(level, blockpos).isEmpty();
          if (flag && p_155142_ != MysteriousBeehiveEntity.BeeReleaseStatus.EMERGENCY) {
             return false;
          } else {
-            Entity entity = EntityType.loadEntityRecursive(compoundtag, p_155137_, (p_58740_) -> {
+            Entity entity = EntityType.loadEntityRecursive(compoundtag, level, (p_58740_) -> {
                return p_58740_;
             });
-            if (entity != null) {
-               if (!entity.getType().is(EntityTypeTags.BEEHIVE_INHABITORS)) {
-                  return false;
-               } else {
-                  if (entity instanceof CommonBee) {
-                     CommonBee bee = (CommonBee)entity;
-                     if (p_155143_ != null && !bee.hasSavedFlowerPos() && p_155137_.random.nextFloat() < 0.9F) {
-                        bee.setSavedFlowerPos(p_155143_);
-                     }
-
-                     if (p_155142_ == MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED) {
-                        bee.dropOffNectar();
-                        if (p_155139_.is(BlockTags.BEEHIVES, (p_202037_) -> {
-                           return p_202037_.hasProperty(MysteriousBeehive.HONEY_LEVEL);
-                        })) {
-                           int i = getHoneyLevel(p_155139_);
-                           if (i < 5) {
-                              int j = p_155137_.random.nextInt(100) == 0 ? 2 : 1;
-                              if (i + j > 5) {
-                                 --j;
-                              }
-
-                              p_155137_.setBlockAndUpdate(p_155138_, p_155139_.setValue(MysteriousBeehive.HONEY_LEVEL, Integer.valueOf(i + j)));
-                           }
-                        }
-                     }
-
-                     setBeeReleaseData(p_155140_.ticksInHive, bee);
-                     if (p_155141_ != null) {
-                        p_155141_.add(bee);
-                     }
-
-                     float f = entity.getBbWidth();
-                     double d3 = flag ? 0.0D : 0.55D + (double)(f / 2.0F);
-                     double d0 = (double)p_155138_.getX() + 0.5D + d3 * (double)direction.getStepX();
-                     double d1 = (double)p_155138_.getY() + 0.5D - (double)(entity.getBbHeight() / 2.0F);
-                     double d2 = (double)p_155138_.getZ() + 0.5D + d3 * (double)direction.getStepZ();
-                     entity.moveTo(d0, d1, d2, entity.getYRot(), entity.getXRot());
-                  }
-
-                  p_155137_.playSound((Player)null, p_155138_, SoundEvents.BEEHIVE_EXIT, SoundSource.BLOCKS, 1.0F, 1.0F);
-                  p_155137_.gameEvent(GameEvent.BLOCK_CHANGE, p_155138_, GameEvent.Context.of(entity, p_155137_.getBlockState(p_155138_)));
-                  return p_155137_.addFreshEntity(entity);
+            if (entity instanceof CommonBee bee) {
+               if (flowerPos != null && !bee.hasSavedFlowerPos() && level.random.nextFloat() < 0.9F) {
+                  bee.setSavedFlowerPos(flowerPos);
                }
+               if (p_155142_ == MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED) {
+                  bee.dropOffNectar();
+                  if (blockState.is(BlockTags.BEEHIVES, (p_202037_) -> {
+                     return p_202037_.hasProperty(MysteriousBeehive.HONEY_LEVEL);
+                  })) {
+                     int i = getHoneyLevel(blockState);
+                     if (i < 5) {
+                        int j = level.random.nextInt(100) == 0 ? 2 : 1;
+                        if (i + j > 5) {
+                           --j;
+                        }
+
+                        level.setBlockAndUpdate(blockPos, blockState.setValue(MysteriousBeehive.HONEY_LEVEL, Integer.valueOf(i + j)));
+                     }
+                  }
+               }
+
+               setBeeReleaseData(beeData.ticksInHive, bee);
+               if (entityList != null) {
+                  entityList.add(bee);
+               }
+
+               float f = entity.getBbWidth();
+               double d3 = flag ? 0.0D : 0.55D + (double)(f / 2.0F);
+               double d0 = (double)blockPos.getX() + 0.5D + d3 * (double)direction.getStepX();
+               double d1 = (double)blockPos.getY() + 0.5D - (double)(entity.getBbHeight() / 2.0F);
+               double d2 = (double)blockPos.getZ() + 0.5D + d3 * (double)direction.getStepZ();
+               entity.moveTo(d0, d1, d2, entity.getYRot(), entity.getXRot());
+
+               level.playSound((Player)null, blockPos, SoundEvents.BEEHIVE_EXIT, SoundSource.BLOCKS, 1.0F, 1.0F);
+               level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(entity, level.getBlockState(blockPos)));
+               return level.addFreshEntity(entity);
             } else {
                return false;
             }
@@ -342,16 +343,20 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       return listtag;
    }
 
+   public ItemStack getCurrentProduction() {
+      return currentProduction;
+   }
+
    static class BeeData {
       final CompoundTag entityData;
       int ticksInHive;
       final int minOccupationTicks;
 
-      BeeData(CompoundTag p_58786_, int p_58787_, int p_58788_) {
-         MysteriousBeehiveEntity.removeIgnoredBeeTags(p_58786_);
-         this.entityData = p_58786_;
-         this.ticksInHive = p_58787_;
-         this.minOccupationTicks = p_58788_;
+      BeeData(CompoundTag tag, int ticksInHive, int minTicksOccupation) {
+         MysteriousBeehiveEntity.removeIgnoredBeeTags(tag);
+         this.entityData = tag;
+         this.ticksInHive = ticksInHive;
+         this.minOccupationTicks = minTicksOccupation;
       }
    }
 
