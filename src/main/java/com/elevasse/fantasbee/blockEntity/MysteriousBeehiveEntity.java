@@ -36,31 +36,31 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MysteriousBeehiveEntity extends BlockEntity {
-    int honeyLevel;
+    //int honeyLevel;
     private ItemStack currentProduction = Items.IRON_INGOT.getDefaultInstance();
     
     public MysteriousBeehiveEntity(BlockPos pos, BlockState state) {
         super(RefBlockEntity.MYSTERIOUS_BEEHIVE.get(), pos, state);
     }
 
-    public void increase(){
+  /*  public void increase(){
         honeyLevel++;
     }
 
     public int gethoneyLevel() {
         return honeyLevel;
     }
-
+*/
     @Override
     protected void saveAdditional(CompoundTag tag) {
-        tag.putInt("honeyLevel", this.honeyLevel);
+      //  tag.putInt("honeyLevel", this.honeyLevel);
         super.saveAdditional(tag);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        this.honeyLevel = tag.getInt("honeyLevel");
+        //this.honeyLevel = tag.getInt("honeyLevel");
     }
 
    public static final String TAG_FLOWER_POS = "FlowerPos";
