@@ -57,6 +57,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
 
     public MysteriousBeehiveEntity(BlockPos pos, BlockState state) {
         super(RefBlockEntity.MYSTERIOUS_BEEHIVE.get(), pos, state);
+        currentProduction = Items.AIR.getDefaultInstance();
     }
 
     public void setCurrentProduction( ItemStack item ){
@@ -306,12 +307,12 @@ public class MysteriousBeehiveEntity extends BlockEntity {
 
     @Override
    public void saveAdditional(CompoundTag tag) {
+        System.out.printf("Saving Mysterious beehive\n");
       tag.put("Bees", this.writeBees());
       if (this.hasSavedFlowerPos()) {
          tag.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
       }
-      if (!this.currentProduction.isEmpty())
-          tag.put("Production", this.currentProduction.serializeNBT());
+      tag.put("Production", this.currentProduction.serializeNBT());
       super.saveAdditional(tag);
    }
 

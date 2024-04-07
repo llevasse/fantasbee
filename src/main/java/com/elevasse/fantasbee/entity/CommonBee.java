@@ -1201,6 +1201,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       private Optional<BlockPos> findNearbyFlower() {
+         System.out.printf("Searching flower...\n");
          return this.findNearestBlock(this.VALID_POLLINATION_BLOCKS, 5.0D);
       }
 
@@ -1214,6 +1215,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                   for(int l = k < j && k > -j ? j : 0; l <= j; l = l > 0 ? -l : 1 - l) {
                      blockpos$mutableblockpos.setWithOffset(blockpos, k, i - 1, l);
                      if (blockpos.closerThan(blockpos$mutableblockpos, range) && blockStatePredicate.test(CommonBee.this.level.getBlockState(blockpos$mutableblockpos))) {
+                        System.out.printf("found at %d %d %d :)\n", blockpos$mutableblockpos.getX(), blockpos$mutableblockpos.getY(), blockpos$mutableblockpos.getZ());
                         return Optional.of(blockpos$mutableblockpos);
                      }
                   }
