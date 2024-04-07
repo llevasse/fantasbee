@@ -57,7 +57,6 @@ public class MysteriousBeehiveEntity extends BlockEntity {
 
     public MysteriousBeehiveEntity(BlockPos pos, BlockState state) {
         super(RefBlockEntity.MYSTERIOUS_BEEHIVE.get(), pos, state);
-        currentProduction = Items.AIR.getDefaultInstance();
     }
 
     public void setCurrentProduction( ItemStack item ){
@@ -286,13 +285,13 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       }
    }
 
+    @Override
    public void load(CompoundTag tag) {
         super.load(tag);
         this.stored.clear();
         ListTag listtag = tag.getList("Bees", 10);
 
-        currentProduction = ItemStack.of(tag.getCompound("Production"));
-        System.out.printf("Current production : %s\n", currentProduction.getDisplayName());
+        this.currentProduction = ItemStack.of(tag.getCompound("Production"));
         for(int i = 0; i < listtag.size(); ++i) {
             CompoundTag compoundtag = listtag.getCompound(i);
             MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata = new MysteriousBeehiveEntity.BeeData(compoundtag.getCompound("EntityData"), compoundtag.getInt("TicksInHive"), compoundtag.getInt("MinOccupationTicks"));
@@ -305,13 +304,14 @@ public class MysteriousBeehiveEntity extends BlockEntity {
         }
     }
 
-   protected void saveAdditional(CompoundTag tag) {
-      super.saveAdditional(tag);
+    @Override
+   public void saveAdditional(CompoundTag tag) {
       tag.put("Bees", this.writeBees());
       if (this.hasSavedFlowerPos()) {
          tag.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
       }
-      tag.put("Production", this.currentProduction.save(new CompoundTag()));
+       tag.put("Production", this.currentProduction.serializeNBT());
+      super.saveAdditional(tag);
    }
 
    public ListTag writeBees() {
