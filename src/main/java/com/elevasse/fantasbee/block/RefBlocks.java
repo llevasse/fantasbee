@@ -2,11 +2,15 @@ package com.elevasse.fantasbee.block;
 
 import com.elevasse.fantasbee.fantasbee;
 import com.elevasse.fantasbee.item.RefItems;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FlowerBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
@@ -23,6 +27,8 @@ public class RefBlocks {
 
 
     public static final RegistryObject<Block> MYSTERIOUS_BEEHIVE = registerBlock("mysterious_beehive", () -> new MysteriousBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
+
+    public static final RegistryObject<Block> IRON_FLOWER = registerBlock("iron_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name,block);

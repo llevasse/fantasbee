@@ -59,10 +59,10 @@ public class fantasbee
 
     private void addCreative(CreativeModeTabEvent.BuildContents event)
     {
-        if (event.getTab() == CreativeModeTabs.SEARCH)
+        if (event.getTab() == CreativeModeTabs.SEARCH || event.getTab() == CreativeModeTabs.NATURAL_BLOCKS) {
             event.accept(RefBlocks.MYSTERIOUS_BEEHIVE);
-        if (event.getTab() == CreativeModeTabs.NATURAL_BLOCKS)
-            event.accept(RefBlocks.MYSTERIOUS_BEEHIVE);
+            event.accept(RefBlocks.IRON_FLOWER);
+        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
