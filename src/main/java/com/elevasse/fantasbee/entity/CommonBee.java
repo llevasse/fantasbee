@@ -11,6 +11,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 
@@ -583,7 +584,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    boolean isFlowerValid(BlockPos p_27897_) {
-      return this.level.isLoaded(p_27897_) && this.level.getBlockState(p_27897_).is(BlockTags.FLOWERS);
+      return this.level.isLoaded(p_27897_) && this.level.getBlockState(p_27897_).is(RefBlocks.IRON_FLOWER.get());
    }
 
    protected void playStepSound(BlockPos p_27820_, BlockState p_27821_) {
@@ -1015,13 +1016,28 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       private List<BlockPos> findNearbyHivesWithSpace() {
          BlockPos blockpos = CommonBee.this.blockPosition();
          List<BlockPos> list = new ArrayList<>();
+         BlockState flower = null;
+         System.out.printf("Has flower saved : %b\n", CommonBee.this.hasSavedFlowerPos());
+         if (CommonBee.this.hasSavedFlowerPos()) {
+            flower = CommonBee.this.level.getBlockState(CommonBee.this.savedFlowerPos);
+            System.out.printf("Flower saved : %s\n", flower.getBlock().getName().getString());
+         }
          int   range = 8;
          int   x = blockpos.getX() - range, y = blockpos.getY() - range, z = blockpos.getZ() - range;
          for (int checkX = x; checkX <= x + (range * 2) + 1; checkX++){
             for (int checkY = y; checkY <= y + (range * 2) + 1; checkY++){
                for (int checkZ = z; checkZ <= z + (range * 2) + 1; checkZ++){
-                  if (doesHiveHaveSpace(new BlockPos(checkX, checkY, checkZ)))
-                     list.add(new BlockPos(checkX, checkY, checkZ));
+                  if (doesHiveHaveSpace(new BlockPos(checkX, checkY, checkZ))) {
+                     if (flower == null)
+                        list.add(new BlockPos(checkX, checkY, checkZ));
+                     else {
+                        MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) CommonBee.this.level.getBlockEntity(new BlockPos(checkX, checkY, checkZ));
+                        System.out.printf("Current prof : %s\n", mysteriousBeehiveEntity.getCurrentProduction().getDisplayName().getString());
+                        if (flower.is(RefBlocks.IRON_FLOWER.get()) && mysteriousBeehiveEntity.getCurrentProduction().is(Items.IRON_NUGGET))
+                           list.add(new BlockPos(checkX, checkY, checkZ));
+
+                     }
+                  }
                }
             }
          }
