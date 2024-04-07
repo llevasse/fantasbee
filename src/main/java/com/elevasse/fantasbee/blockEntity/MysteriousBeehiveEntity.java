@@ -5,6 +5,7 @@ import com.elevasse.fantasbee.block.MysteriousBeehive;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -12,6 +13,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -36,47 +38,35 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MysteriousBeehiveEntity extends BlockEntity {
-    //int honeyLevel;
-    private ItemStack currentProduction = Items.IRON_INGOT.getDefaultInstance();
-    
+    private ItemStack currentProduction;
+
+    public static final String TAG_FLOWER_POS = "FlowerPos";
+    public static final String MIN_OCCUPATION_TICKS = "MinOccupationTicks";
+    public static final String ENTITY_DATA = "EntityData";
+    public static final String TICKS_IN_HIVE = "TicksInHive";
+    public static final String HAS_NECTAR = "HasNectar";
+    public static final String BEES = "Bees";
+    private static final List<String> IGNORED_BEE_TAGS = Arrays.asList("Air", "ArmorDropChances", "ArmorItems", "Brain", "CanPickUpLoot", "DeathTime", "FallDistance", "FallFlying", "Fire", "HandDropChances", "HandItems", "HurtByTimestamp", "HurtTime", "LeftHanded", "Motion", "NoGravity", "OnGround", "PortalCooldown", "Pos", "Rotation", "CannotEnterHiveTicks", "TicksSincePollination", "CropsGrownSincePollination", "HivePos", "Passengers", "Leash", "UUID");
+    public static final int MAX_OCCUPANTS = 3;
+    private static final int MIN_TICKS_BEFORE_REENTERING_HIVE = 400;
+    private static final int MIN_OCCUPATION_TICKS_NECTAR = 2400;
+    public static final int MIN_OCCUPATION_TICKS_NECTARLESS = 600;
+    private final List<BeeData> stored = Lists.newArrayList();
+    @Nullable
+    private BlockPos savedFlowerPos;
+
     public MysteriousBeehiveEntity(BlockPos pos, BlockState state) {
         super(RefBlockEntity.MYSTERIOUS_BEEHIVE.get(), pos, state);
+        currentProduction = Items.AIR.getDefaultInstance();
     }
 
-  /*  public void increase(){
-        honeyLevel++;
+    public void setCurrentProduction( ItemStack item ){
+        currentProduction = item;
     }
 
-    public int gethoneyLevel() {
-        return honeyLevel;
+    public ItemStack getCurrentProduction( ){
+        return currentProduction;
     }
-*/
-    @Override
-    protected void saveAdditional(CompoundTag tag) {
-      //  tag.putInt("honeyLevel", this.honeyLevel);
-        super.saveAdditional(tag);
-    }
-
-    @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        //this.honeyLevel = tag.getInt("honeyLevel");
-    }
-
-   public static final String TAG_FLOWER_POS = "FlowerPos";
-   public static final String MIN_OCCUPATION_TICKS = "MinOccupationTicks";
-   public static final String ENTITY_DATA = "EntityData";
-   public static final String TICKS_IN_HIVE = "TicksInHive";
-   public static final String HAS_NECTAR = "HasNectar";
-   public static final String BEES = "Bees";
-   private static final List<String> IGNORED_BEE_TAGS = Arrays.asList("Air", "ArmorDropChances", "ArmorItems", "Brain", "CanPickUpLoot", "DeathTime", "FallDistance", "FallFlying", "Fire", "HandDropChances", "HandItems", "HurtByTimestamp", "HurtTime", "LeftHanded", "Motion", "NoGravity", "OnGround", "PortalCooldown", "Pos", "Rotation", "CannotEnterHiveTicks", "TicksSincePollination", "CropsGrownSincePollination", "HivePos", "Passengers", "Leash", "UUID");
-   public static final int MAX_OCCUPANTS = 3;
-   private static final int MIN_TICKS_BEFORE_REENTERING_HIVE = 400;
-   private static final int MIN_OCCUPATION_TICKS_NECTAR = 2400;
-   public static final int MIN_OCCUPATION_TICKS_NECTARLESS = 600;
-   private final List<BeeData> stored = Lists.newArrayList();
-   @Nullable
-   private BlockPos savedFlowerPos;
 
    public void setChanged() {
       if (this.isFireNearby() && this.level != null) {
@@ -295,34 +285,35 @@ public class MysteriousBeehiveEntity extends BlockEntity {
          level.playSound((Player)null, d0, d1, d2, SoundEvents.BEEHIVE_WORK, SoundSource.BLOCKS, 1.0F, 1.0F);
       }
    }
-/*
-   public void load(CompoundTag p_155156_) {
-      super.load(p_155156_);
-      this.stored.clear();
-      ListTag listtag = p_155156_.getList("Bees", 10);
 
-      for(int i = 0; i < listtag.size(); ++i) {
-         CompoundTag compoundtag = listtag.getCompound(i);
-         MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata = new MysteriousBeehiveEntity.BeeData(compoundtag.getCompound("EntityData"), compoundtag.getInt("TicksInHive"), compoundtag.getInt("MinOccupationTicks"));
-         this.stored.add(MysteriousBeehiveEntity$beedata);
-      }
+   public void load(CompoundTag tag) {
+        super.load(tag);
+        this.stored.clear();
+        ListTag listtag = tag.getList("Bees", 10);
 
-      this.savedFlowerPos = null;
-      if (p_155156_.contains("FlowerPos")) {
-         this.savedFlowerPos = NbtUtils.readBlockPos(p_155156_.getCompound("FlowerPos"));
-      }
+        currentProduction = ItemStack.of(tag.getCompound("Production"));
+        System.out.printf("Current production : %s\n", currentProduction.getDisplayName());
+        for(int i = 0; i < listtag.size(); ++i) {
+            CompoundTag compoundtag = listtag.getCompound(i);
+            MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata = new MysteriousBeehiveEntity.BeeData(compoundtag.getCompound("EntityData"), compoundtag.getInt("TicksInHive"), compoundtag.getInt("MinOccupationTicks"));
+            this.stored.add(MysteriousBeehiveEntity$beedata);
+        }
 
-   }
+        this.savedFlowerPos = null;
+        if (tag.contains("FlowerPos")) {
+            this.savedFlowerPos = NbtUtils.readBlockPos(tag.getCompound("FlowerPos"));
+        }
+    }
 
-   protected void saveAdditional(CompoundTag p_187467_) {
-      super.saveAdditional(p_187467_);
-      p_187467_.put("Bees", this.writeBees());
+   protected void saveAdditional(CompoundTag tag) {
+      super.saveAdditional(tag);
+      tag.put("Bees", this.writeBees());
       if (this.hasSavedFlowerPos()) {
-         p_187467_.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
+         tag.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
       }
-
+      tag.put("Production", this.currentProduction.save(new CompoundTag()));
    }
-*/
+
    public ListTag writeBees() {
       ListTag listtag = new ListTag();
 
@@ -337,10 +328,6 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       }
 
       return listtag;
-   }
-
-   public ItemStack getCurrentProduction() {
-      return currentProduction;
    }
 
     static class BeeData {
