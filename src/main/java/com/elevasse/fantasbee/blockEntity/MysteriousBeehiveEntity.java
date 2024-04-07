@@ -310,7 +310,8 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       if (this.hasSavedFlowerPos()) {
          tag.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
       }
-       tag.put("Production", this.currentProduction.serializeNBT());
+      if (!this.currentProduction.isEmpty())
+          tag.put("Production", this.currentProduction.serializeNBT());
       super.saveAdditional(tag);
    }
 

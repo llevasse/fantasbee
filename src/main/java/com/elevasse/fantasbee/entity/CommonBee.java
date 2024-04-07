@@ -1,5 +1,6 @@
 package com.elevasse.fantasbee.entity;
 
+import com.elevasse.fantasbee.block.RefBlocks;
 import com.elevasse.fantasbee.blockEntity.MysteriousBeehiveEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -1048,15 +1049,11 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       private static final int MIN_POLLINATION_TICKS = 400;
       private static final int MIN_FIND_FLOWER_RETRY_COOLDOWN = 20;
       private static final int MAX_FIND_FLOWER_RETRY_COOLDOWN = 60;
-      private final Predicate<BlockState> VALID_POLLINATION_BLOCKS = (p_28074_) -> {
-         if (p_28074_.hasProperty(BlockStateProperties.WATERLOGGED) && p_28074_.getValue(BlockStateProperties.WATERLOGGED)) {
+      private final Predicate<BlockState> VALID_POLLINATION_BLOCKS = (blockState) -> {
+         if (blockState.hasProperty(BlockStateProperties.WATERLOGGED) && blockState.getValue(BlockStateProperties.WATERLOGGED)) {
             return false;
-         } else if (p_28074_.is(BlockTags.FLOWERS)) {
-            if (p_28074_.is(Blocks.SUNFLOWER)) {
-               return p_28074_.getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER;
-            } else {
-               return true;
-            }
+         } else if (blockState.is(RefBlocks.IRON_FLOWER.get())) {
+            return true;
          } else {
             return false;
          }
@@ -1207,16 +1204,16 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          return this.findNearestBlock(this.VALID_POLLINATION_BLOCKS, 5.0D);
       }
 
-      private Optional<BlockPos> findNearestBlock(Predicate<BlockState> p_28076_, double p_28077_) {
+      private Optional<BlockPos> findNearestBlock(Predicate<BlockState> blockStatePredicate, double range) {
          BlockPos blockpos = CommonBee.this.blockPosition();
          BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
 
-         for(int i = 0; (double)i <= p_28077_; i = i > 0 ? -i : 1 - i) {
-            for(int j = 0; (double)j < p_28077_; ++j) {
+         for(int i = 0; (double)i <= range; i = i > 0 ? -i : 1 - i) {
+            for(int j = 0; (double)j < range; ++j) {
                for(int k = 0; k <= j; k = k > 0 ? -k : 1 - k) {
                   for(int l = k < j && k > -j ? j : 0; l <= j; l = l > 0 ? -l : 1 - l) {
                      blockpos$mutableblockpos.setWithOffset(blockpos, k, i - 1, l);
-                     if (blockpos.closerThan(blockpos$mutableblockpos, p_28077_) && p_28076_.test(CommonBee.this.level.getBlockState(blockpos$mutableblockpos))) {
+                     if (blockpos.closerThan(blockpos$mutableblockpos, range) && blockStatePredicate.test(CommonBee.this.level.getBlockState(blockpos$mutableblockpos))) {
                         return Optional.of(blockpos$mutableblockpos);
                      }
                   }
