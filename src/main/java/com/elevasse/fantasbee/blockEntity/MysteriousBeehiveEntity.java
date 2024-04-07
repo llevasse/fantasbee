@@ -184,7 +184,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
    }
 
    public void storeBee(CompoundTag tag, int ticksInHive, boolean minTickOccupation) {
-      this.stored.add(new MysteriousBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 800 : 600));
+      this.stored.add(new MysteriousBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 3 : 1)); //default 2400 : 600
    }
 
    private static boolean releaseOccupant(Level level, BlockPos blockPos, BlockState blockState, MysteriousBeehiveEntity.BeeData beeData, @Nullable List<Entity> entityList, MysteriousBeehiveEntity.BeeReleaseStatus p_155142_, @Nullable BlockPos flowerPos) {
@@ -263,15 +263,16 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       return this.savedFlowerPos != null;
    }
 
-   private static void tickOccupants(Level p_155150_, BlockPos p_155151_, BlockState p_155152_, List<MysteriousBeehiveEntity.BeeData> p_155153_, @Nullable BlockPos p_155154_) {
+   private static void tickOccupants(Level level, BlockPos blockPos, BlockState blockState, List<MysteriousBeehiveEntity.BeeData> beeDataList, @Nullable BlockPos flowerPos) {
       boolean flag = false;
 
       MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata;
-      for(Iterator<BeeData> iterator = p_155153_.iterator(); iterator.hasNext(); ++MysteriousBeehiveEntity$beedata.ticksInHive) {
+      for(Iterator<BeeData> iterator = beeDataList.iterator(); iterator.hasNext(); ++MysteriousBeehiveEntity$beedata.ticksInHive) {
          MysteriousBeehiveEntity$beedata = iterator.next();
+          System.out.printf("Ticks in hive : %d\n", MysteriousBeehiveEntity$beedata.ticksInHive);
          if (MysteriousBeehiveEntity$beedata.ticksInHive > MysteriousBeehiveEntity$beedata.minOccupationTicks) {
             MysteriousBeehiveEntity.BeeReleaseStatus MysteriousBeehiveEntity$beereleasestatus = MysteriousBeehiveEntity$beedata.entityData.getBoolean("HasNectar") ? MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED : MysteriousBeehiveEntity.BeeReleaseStatus.BEE_RELEASED;
-            if (releaseOccupant(p_155150_, p_155151_, p_155152_, MysteriousBeehiveEntity$beedata, (List<Entity>)null, MysteriousBeehiveEntity$beereleasestatus, p_155154_)) {
+            if (releaseOccupant(level, blockPos, blockState, MysteriousBeehiveEntity$beedata, (List<Entity>)null, MysteriousBeehiveEntity$beereleasestatus, flowerPos)) {
                flag = true;
                iterator.remove();
             }
@@ -279,12 +280,13 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       }
 
       if (flag) {
-         setChanged(p_155150_, p_155151_, p_155152_);
+         setChanged(level, blockPos, blockState);
       }
 
    }
 
-   public static void serverTick(Level level, BlockPos pos, BlockState state, MysteriousBeehiveEntity entity) {
+   public static <T extends BlockEntity> void serverTick(Level level, BlockPos pos, BlockState state, T t) {
+       MysteriousBeehiveEntity entity = (MysteriousBeehiveEntity) t;
       tickOccupants(level, pos, state, entity.stored, entity.savedFlowerPos);
       if (!entity.stored.isEmpty() && level.getRandom().nextDouble() < 0.005D) {
          double d0 = (double)pos.getX() + 0.5D;
@@ -341,7 +343,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       return currentProduction;
    }
 
-   static class BeeData {
+    static class BeeData {
       final CompoundTag entityData;
       int ticksInHive;
       final int minOccupationTicks;

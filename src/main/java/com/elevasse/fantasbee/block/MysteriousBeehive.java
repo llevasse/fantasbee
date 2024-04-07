@@ -15,9 +15,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
@@ -26,11 +30,12 @@ import org.jetbrains.annotations.Nullable;
 public class MysteriousBeehive extends Block implements EntityBlock {
     public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 5);
     public static Property<Integer> ITEM_HELD;
-    public static Property<Direction> FACING;
+    public static Property<Direction> FACING = DirectionProperty.create("facing");
 
     public MysteriousBeehive(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(HONEY_LEVEL, 0));
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -61,5 +66,13 @@ public class MysteriousBeehive extends Block implements EntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> blockStateBuilder) {
         blockStateBuilder.add(HONEY_LEVEL);
+        blockStateBuilder.add(FACING);
+    }
+
+    // MobSlayerBlock.java
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return type == RefBlockEntity.MYSTERIOUS_BEEHIVE.get() ? MysteriousBeehiveEntity::serverTick : null;
     }
 }
