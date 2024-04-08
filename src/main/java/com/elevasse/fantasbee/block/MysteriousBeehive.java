@@ -49,8 +49,12 @@ public class MysteriousBeehive extends Block implements EntityBlock {
                         System.out.printf("Current honey level : %d\n", ((MysteriousBeehiveEntity) entity).getHoneyLevel(blockstate));
                         System.out.printf("Current production : %s\n", (((MysteriousBeehiveEntity) entity).getCurrentProduction().getDisplayName().getString()));
                     }
-                    else if (held.is(Items.SHEARS))
-                        popResource(level, pos, new ItemStack(((MysteriousBeehiveEntity) entity).getCurrentProduction().getItem()));
+                    else if (held.is(Items.SHEARS)){
+                        if (blockstate.getValue(HONEY_LEVEL) >= 5) {
+                            popResource(level, pos, new ItemStack(((MysteriousBeehiveEntity) entity).getCurrentProduction().getItem()));
+                            level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HONEY_LEVEL, 0));
+                        }
+                    }
                     else {
                         ((MysteriousBeehiveEntity) entity).setCurrentProduction(held.getItem().getDefaultInstance());
                     }
