@@ -664,6 +664,29 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       return p_27817_.closerThan(this.blockPosition(), (double)p_27818_);
    }
 
+   public boolean checkHiveReciprocity(){
+      BlockState flower = null;
+
+      System.out.printf("Check hive reicprocity\n");
+
+      if (CommonBee.this.hasSavedFlowerPos()) {
+         flower = CommonBee.this.level.getBlockState(CommonBee.this.savedFlowerPos);
+         System.out.printf("Flower saved : %s\n", flower.getBlock().getName().getString());
+      }
+      if (CommonBee.this.hivePos != null) {
+         MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
+         if (flower != null && !mysteriousBeehiveEntity.getCurrentProduction().is(Items.AIR)) {
+            if (flower.is(RefBlocks.IRON_FLOWER.get()) && !mysteriousBeehiveEntity.getCurrentProduction().is(Items.IRON_NUGGET)) {
+               CommonBee.this.hivePos = null;
+               CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
+               return false;
+            }
+         }
+      }
+      return true;
+   }
+
+
    abstract class BaseBeeGoal extends Goal {
       public abstract boolean canBeeUse();
 
@@ -723,7 +746,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
             BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
             if (blockentity instanceof MysteriousBeehiveEntity) {
                MysteriousBeehiveEntity beehiveblockentity = (MysteriousBeehiveEntity)blockentity;
-               if (!beehiveblockentity.isFull()) {
+               if (!beehiveblockentity.isFull() && CommonBee.this.checkHiveReciprocity()) {
                   return true;
                }
 
@@ -763,7 +786,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       public boolean canBeeUse() {
-         return CommonBee.this.hivePos != null && !CommonBee.this.hasRestriction() && CommonBee.this.wantsToEnterHive() && !this.hasReachedTarget(CommonBee.this.hivePos) && CommonBee.this.level.getBlockState(CommonBee.this.hivePos).is(BlockTags.BEEHIVES);
+         return CommonBee.this.hivePos != null && !CommonBee.this.hasRestriction() && CommonBee.this.wantsToEnterHive() && !this.hasReachedTarget(CommonBee.this.hivePos) && CommonBee.this.level.getBlockState(CommonBee.this.hivePos).is(RefBlocks.MYSTERIOUS_BEEHIVE.get());
       }
 
       public boolean canBeeContinueToUse() {
@@ -783,9 +806,13 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          CommonBee.this.navigation.resetMaxVisitedNodesMultiplier();
       }
 
+
       public void tick() {
          if (CommonBee.this.hivePos != null) {
             ++this.travellingTicks;
+            MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
+            if (!CommonBee.this.checkHiveReciprocity())
+               return ;
             if (this.travellingTicks > this.adjustedTickDelay(600)) {
                this.dropAndBlacklistHive();
             } else if (!CommonBee.this.navigation.isInProgress()) {
@@ -846,6 +873,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       private void dropHive() {
+         System.out.printf("Droping hive :(\n");
          CommonBee.this.hivePos = null;
          CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
       }
@@ -1017,10 +1045,10 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          BlockPos blockpos = CommonBee.this.blockPosition();
          List<BlockPos> list = new ArrayList<>();
          BlockState flower = null;
-         System.out.printf("Has flower saved : %b\n", CommonBee.this.hasSavedFlowerPos());
+      //   System.out.printf("Has flower saved : %b\n", CommonBee.this.hasSavedFlowerPos());
          if (CommonBee.this.hasSavedFlowerPos()) {
             flower = CommonBee.this.level.getBlockState(CommonBee.this.savedFlowerPos);
-            System.out.printf("Flower saved : %s\n", flower.getBlock().getName().getString());
+      //      System.out.printf("Flower saved : %s\n", flower.getBlock().getName().getString());
          }
          int   range = 8;
          int   x = blockpos.getX() - range, y = blockpos.getY() - range, z = blockpos.getZ() - range;
