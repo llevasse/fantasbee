@@ -2,7 +2,7 @@
   "parent": "minecraft:block/orientable_with_bottom",
   "textures": {
     "bottom": "fantasbee:block/mysterious_beehive_end",
-    "front": "fantasbee:block/mysterious_beehive_front",
+    "front": "fantasbee:block/mysterious_beehive_front_honey",
     "particle": "fantasbee:block/mysterious_beehive_side",
     "side": "fantasbee:block/mysterious_beehive_side",
     "top": "fantasbee:block/mysterious_beehive_end"

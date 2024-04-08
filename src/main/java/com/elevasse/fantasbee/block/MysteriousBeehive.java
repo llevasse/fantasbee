@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -39,6 +40,11 @@ public class MysteriousBeehive extends Block implements EntityBlock {
     }
 
     @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+    }
+
+    @Override
     public InteractionResult use(BlockState blockstate, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
         if (!level.isClientSide()) {
             ItemStack held = player.getItemInHand(hand);
@@ -55,9 +61,9 @@ public class MysteriousBeehive extends Block implements EntityBlock {
                             level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HONEY_LEVEL, 0));
                         }
                     }
-                    else {
+/*                    else {
                         ((MysteriousBeehiveEntity) entity).setCurrentProduction(held.getItem().getDefaultInstance());
-                    }
+                    }*/
                     return InteractionResult.SUCCESS;
                 }
             }
