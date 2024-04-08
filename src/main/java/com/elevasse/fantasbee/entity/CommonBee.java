@@ -182,6 +182,9 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    private BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
    private int underWaterTicks;
 
+   private ItemStack flowerProduction = Items.AIR.getDefaultInstance();
+
+
    protected void defineSynchedData() {
       super.defineSynchedData();
       this.entityData.define(DATA_FLAGS_ID, (byte)0);
@@ -666,32 +669,32 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    public boolean checkHiveReciprocity(BlockPos blockPos){
-      BlockState flower = null;
-      ItemStack flowerProduction = null;
-
 //      System.out.printf("Check hive reicprocity\n");
 
-      if (!CommonBee.this.hasSavedFlowerPos())
+      if (!CommonBee.this.hasSavedFlowerPos() || !CommonBee.this.hasNectar())
          return true;
-      flower = CommonBee.this.level.getBlockState(CommonBee.this.savedFlowerPos);
-      if (flower.is(RefBlocks.IRON_FLOWER.get()))
-         flowerProduction = Items.IRON_NUGGET.getDefaultInstance();
       MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) CommonBee.this.level.getBlockEntity(blockPos);
       if (mysteriousBeehiveEntity == null) {
-  //       return false;
+         return false;
       }
       if (mysteriousBeehiveEntity.getCurrentProduction().is(Items.AIR))
          return true;
-      if (flowerProduction != null) {
 //         System.out.printf("Flower production saved : %s\n", flowerProduction.getDisplayName().getString());
-         if (!mysteriousBeehiveEntity.getCurrentProduction().is(flowerProduction.getItem())) {
-            CommonBee.this.hivePos = null;
-            CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
+      if (!mysteriousBeehiveEntity.getCurrentProduction().is(CommonBee.this.getFlowerProduction().getItem())) {
+         CommonBee.this.hivePos = null;
+         CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
 //            System.out.printf("Dropping hive :(\n");
-            return false;
-         }
+         return false;
       }
       return true;
+   }
+
+   public ItemStack getFlowerProduction() {
+      return flowerProduction;
+   }
+
+   public void setFlowerProduction(ItemStack flowerProduction) {
+      this.flowerProduction = flowerProduction;
    }
 
 
@@ -1173,6 +1176,10 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
       public void stop() {
          if (this.hasPollinatedLongEnough()) {
+            if (CommonBee.this.level.getBlockState(CommonBee.this.savedFlowerPos).is(RefBlocks.IRON_FLOWER.get()))
+               CommonBee.this.setFlowerProduction(Items.IRON_NUGGET.getDefaultInstance());
+            else
+               CommonBee.this.setFlowerProduction(Items.HONEYCOMB.getDefaultInstance());
             CommonBee.this.setHasNectar(true);
          }
 

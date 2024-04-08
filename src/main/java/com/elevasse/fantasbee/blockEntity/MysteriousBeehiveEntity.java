@@ -130,7 +130,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
    }
 
    public void addOccupant(Entity commonBee, boolean p_58743_) {
-      this.addOccupantWithPresetTicks(commonBee, p_58743_, 0);
+        this.addOccupantWithPresetTicks(commonBee, p_58743_, 0);
    }
 
    public int getOccupantCount() {
@@ -158,9 +158,12 @@ public class MysteriousBeehiveEntity extends BlockEntity {
          if (this.level != null) {
             if (commonBee instanceof CommonBee) {
                CommonBee bee = (CommonBee)commonBee;
-               if (bee.hasSavedFlowerPos() && (!this.hasSavedFlowerPos() || this.level.random.nextBoolean())) {
+                if (this.getCurrentProduction().is(Items.AIR)){
+                    this.setCurrentProduction(bee.getFlowerProduction());
+                }
+                if (bee.hasSavedFlowerPos() && !this.hasSavedFlowerPos()) {
                   this.savedFlowerPos = bee.getSavedFlowerPos();
-               }
+                }
             }
 
             BlockPos blockpos = this.getBlockPos();
