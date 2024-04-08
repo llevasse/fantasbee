@@ -669,7 +669,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       BlockState flower = null;
       ItemStack flowerProduction = null;
 
-      System.out.printf("Check hive reicprocity\n");
+//      System.out.printf("Check hive reicprocity\n");
 
       if (!CommonBee.this.hasSavedFlowerPos())
          return true;
@@ -678,17 +678,16 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          flowerProduction = Items.IRON_NUGGET.getDefaultInstance();
       MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) CommonBee.this.level.getBlockEntity(blockPos);
       if (mysteriousBeehiveEntity == null) {
-         System.out.printf("Block pos at %d, %d, %d is not a hive\n", blockPos.getX(), blockPos.getY(), blockPos.getZ());
-         return false;
+  //       return false;
       }
       if (mysteriousBeehiveEntity.getCurrentProduction().is(Items.AIR))
          return true;
       if (flowerProduction != null) {
-         System.out.printf("Flower production saved : %s\n", flowerProduction.getDisplayName().getString());
+//         System.out.printf("Flower production saved : %s\n", flowerProduction.getDisplayName().getString());
          if (!mysteriousBeehiveEntity.getCurrentProduction().is(flowerProduction.getItem())) {
             CommonBee.this.hivePos = null;
             CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
-            System.out.printf("Dropping hive :(\n");
+//            System.out.printf("Dropping hive :(\n");
             return false;
          }
       }
@@ -755,7 +754,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
             BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
             if (blockentity instanceof MysteriousBeehiveEntity) {
                MysteriousBeehiveEntity beehiveblockentity = (MysteriousBeehiveEntity)blockentity;
-               System.out.printf("EnterHiveGoal\n");
+//               System.out.printf("EnterHiveGoal\n");
                if (!beehiveblockentity.isFull() && CommonBee.this.checkHiveReciprocity(CommonBee.this.hivePos)) {
                   return true;
                }
@@ -821,7 +820,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          if (CommonBee.this.hivePos != null) {
             ++this.travellingTicks;
             MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
-            System.out.printf("GoToHiveGoal\n");
+//            System.out.printf("GoToHiveGoal\n");
             if (!CommonBee.this.checkHiveReciprocity(CommonBee.this.hivePos))
                return ;
             if (this.travellingTicks > this.adjustedTickDelay(600)) {
@@ -884,7 +883,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       private void dropHive() {
-         System.out.printf("Droping hive :(\n");
          CommonBee.this.hivePos = null;
          CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
       }
@@ -1034,13 +1032,13 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
       public void start() {
          CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
-         System.out.printf("LocateHiveGoal\n");
+        // System.out.printf("LocateHiveGoal\n");
          List<BlockPos> list = this.findNearbyHivesWithSpace();
          if (!list.isEmpty()) {
             for(BlockPos blockpos : list) {
                if (!CommonBee.this.goToHiveGoal.isTargetBlacklisted(blockpos)) {
                   CommonBee.this.hivePos = blockpos;
-                  System.out.printf("found at : %d,%d,%d", blockpos.getX(), blockpos.getY(), blockpos.getZ());
+ //                 System.out.printf("found at : %d,%d,%d", blockpos.getX(), blockpos.getY(), blockpos.getZ());
                   return;
                }
             }
@@ -1048,8 +1046,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
             CommonBee.this.goToHiveGoal.clearBlacklist();
             CommonBee.this.hivePos = list.get(0);
          }
-         else
-            System.out.println("None found");
+ //        else
+ //           System.out.println("None found");
       }
 
       private List<BlockPos> findNearbyHivesWithSpace() {
@@ -1242,7 +1240,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       private Optional<BlockPos> findNearbyFlower() {
-      //   System.out.printf("Searching flower...\n");
          return this.findNearestBlock(this.VALID_POLLINATION_BLOCKS, 5.0D);
       }
 
@@ -1256,7 +1253,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                   for(int l = k < j && k > -j ? j : 0; l <= j; l = l > 0 ? -l : 1 - l) {
                      blockpos$mutableblockpos.setWithOffset(blockpos, k, i - 1, l);
                      if (blockpos.closerThan(blockpos$mutableblockpos, range) && blockStatePredicate.test(CommonBee.this.level.getBlockState(blockpos$mutableblockpos))) {
-         //               System.out.printf("found at %d %d %d :)\n", blockpos$mutableblockpos.getX(), blockpos$mutableblockpos.getY(), blockpos$mutableblockpos.getZ());
                         return Optional.of(blockpos$mutableblockpos);
                      }
                   }

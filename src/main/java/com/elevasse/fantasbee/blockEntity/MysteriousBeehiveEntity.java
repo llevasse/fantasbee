@@ -259,7 +259,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata;
       for(Iterator<BeeData> iterator = beeDataList.iterator(); iterator.hasNext(); ++MysteriousBeehiveEntity$beedata.ticksInHive) {
          MysteriousBeehiveEntity$beedata = iterator.next();
-          System.out.printf("Ticks in hive : %d\n", MysteriousBeehiveEntity$beedata.ticksInHive);
+  //        System.out.printf("Ticks in hive : %d\n", MysteriousBeehiveEntity$beedata.ticksInHive);
          if (MysteriousBeehiveEntity$beedata.ticksInHive > MysteriousBeehiveEntity$beedata.minOccupationTicks) {
             MysteriousBeehiveEntity.BeeReleaseStatus MysteriousBeehiveEntity$beereleasestatus = MysteriousBeehiveEntity$beedata.entityData.getBoolean("HasNectar") ? MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED : MysteriousBeehiveEntity.BeeReleaseStatus.BEE_RELEASED;
             if (releaseOccupant(level, blockPos, blockState, MysteriousBeehiveEntity$beedata, (List<Entity>)null, MysteriousBeehiveEntity$beereleasestatus, flowerPos)) {
