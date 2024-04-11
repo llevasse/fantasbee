@@ -30,12 +30,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class MysteriousBeehive extends Block implements EntityBlock {
     public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 5);
-    public static Property<Integer> ITEM_HELD;
+    public static final IntegerProperty HIVE_LEVEL = IntegerProperty.create("hive_level", 0, 5);
     public static Property<Direction> FACING = DirectionProperty.create("facing");
 
     public MysteriousBeehive(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(HONEY_LEVEL, 0));
+        this.registerDefaultState(this.stateDefinition.any().setValue(HIVE_LEVEL, 0));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
@@ -54,6 +55,7 @@ public class MysteriousBeehive extends Block implements EntityBlock {
                     if (held.is(Items.AIR)) {
                         System.out.printf("Current honey level : %d\n", ((MysteriousBeehiveEntity) entity).getHoneyLevel(blockstate));
                         System.out.printf("Current production : %s\n", (((MysteriousBeehiveEntity) entity).getCurrentProduction().getDisplayName().getString()));
+                        System.out.printf("Current hive level : %d\n", blockstate.getValue(MysteriousBeehive.HIVE_LEVEL));
                     }
                     else if (held.is(Items.SHEARS)){
                         if (blockstate.getValue(HONEY_LEVEL) >= 5) {
@@ -80,6 +82,7 @@ public class MysteriousBeehive extends Block implements EntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> blockStateBuilder) {
         blockStateBuilder.add(HONEY_LEVEL);
+        blockStateBuilder.add(HIVE_LEVEL);
         blockStateBuilder.add(FACING);
     }
 
