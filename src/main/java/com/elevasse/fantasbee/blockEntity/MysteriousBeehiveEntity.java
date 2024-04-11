@@ -203,7 +203,9 @@ public class MysteriousBeehiveEntity extends BlockEntity {
                       int j = level.random.nextInt(100) == 0 ? 2 : 1;
                       if (i + j > mysteriousBeehiveEntity.MaxHoneyLevel)
                           --j;
-                      level.setBlockAndUpdate(blockPos, blockState.setValue(MysteriousBeehive.HONEY_LEVEL, Integer.valueOf(i + j)));
+                      if (i + j == mysteriousBeehiveEntity.MaxHoneyLevel)
+                          level.setBlockAndUpdate(blockPos, blockState.setValue(MysteriousBeehive.HAS_HONEY, true));
+                      level.setBlockAndUpdate(blockPos, blockState.setValue(MysteriousBeehive.HONEY_LEVEL, i + j));
                   }
                }
 

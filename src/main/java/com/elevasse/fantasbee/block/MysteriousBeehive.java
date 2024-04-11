@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 public class MysteriousBeehive extends Block implements EntityBlock {
     public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 25);
     public static final IntegerProperty HIVE_LEVEL = IntegerProperty.create("hive_level", 0, 4);
+    public static final BooleanProperty HAS_HONEY = BooleanProperty.create("has_honey");
     public static Property<Direction> FACING = DirectionProperty.create("facing");
 
     public MysteriousBeehive(Properties properties) {
@@ -38,6 +40,7 @@ public class MysteriousBeehive extends Block implements EntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(HONEY_LEVEL, 0));
         this.registerDefaultState(this.stateDefinition.any().setValue(HIVE_LEVEL, 0));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(this.stateDefinition.any().setValue(HAS_HONEY, false));
     }
 
     @Override
@@ -58,13 +61,14 @@ public class MysteriousBeehive extends Block implements EntityBlock {
                         System.out.printf("Current hive level : %d\n", blockstate.getValue(MysteriousBeehive.HIVE_LEVEL));
                     }
                     else if (held.is(Items.SHEARS)){
-                        if (blockstate.getValue(HONEY_LEVEL) >= 5) {
+                        if (blockstate.getValue(HAS_HONEY)) {
                             int hLvl = ((MysteriousBeehiveEntity) entity).getMaxHoneyLevel();
                             for (int i = hLvl / 5; i > 0; i--) {
                                 popResource(level, pos, new ItemStack(((MysteriousBeehiveEntity) entity).getCurrentProduction().getItem()));
                                 hLvl -= 5;
                             }
                             level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HONEY_LEVEL, hLvl));
+                            level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HAS_HONEY, false));
                         }
                     }
                     else if (held.is(Items.COPPER_INGOT) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 0){
