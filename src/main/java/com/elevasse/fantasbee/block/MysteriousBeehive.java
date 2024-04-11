@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MysteriousBeehive extends Block implements EntityBlock {
     public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 25);
-    public static final IntegerProperty HIVE_LEVEL = IntegerProperty.create("hive_level", 0, 5);
+    public static final IntegerProperty HIVE_LEVEL = IntegerProperty.create("hive_level", 0, 4);
     public static Property<Direction> FACING = DirectionProperty.create("facing");
 
     public MysteriousBeehive(Properties properties) {
@@ -67,9 +67,21 @@ public class MysteriousBeehive extends Block implements EntityBlock {
                             level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HONEY_LEVEL, hLvl));
                         }
                     }
-                    else if (held.is(Items.IRON_AXE) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 0){
+                    else if (held.is(Items.COPPER_INGOT) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 0){
                         level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 1));
                         ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(10);
+                    }
+                    else if (held.is(Items.IRON_INGOT) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 1){
+                        level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 2));
+                        ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(15);
+                    }
+                    else if (held.is(Items.GOLD_INGOT) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 2){
+                        level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 3));
+                        ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(20);
+                    }
+                    else if (held.is(Items.DIAMOND) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 3){
+                        level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 4));
+                        ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(25);
                     }
                     return InteractionResult.SUCCESS;
                 }
