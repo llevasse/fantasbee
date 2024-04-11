@@ -5,32 +5,22 @@ import com.elevasse.fantasbee.block.MysteriousBeehive;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.EntityTypeTags;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import org.apache.commons.lang3.ObjectUtils;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -54,12 +44,19 @@ public class MysteriousBeehiveEntity extends BlockEntity {
     private final List<BeeData> stored = Lists.newArrayList();
     @Nullable
     private BlockPos savedFlowerPos;
+    private int MAX_HONEY_LEVEL;
 
     public MysteriousBeehiveEntity(BlockPos pos, BlockState state) {
         super(RefBlockEntity.MYSTERIOUS_BEEHIVE.get(), pos, state);
         currentProduction = Items.AIR.getDefaultInstance();
+        MAX_HONEY_LEVEL = 5;
     }
 
+    public void setMaxHoneyLevel(int newLvl){
+        MAX_HONEY_LEVEL = newLvl;
+    }
+
+    public int getMaxHoneyLevel(){ return MAX_HONEY_LEVEL;}
     public void setCurrentProduction( ItemStack item ){
         currentProduction = item;
     }
@@ -70,7 +67,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
 
    public void setChanged() {
       if (this.isFireNearby() && this.level != null) {
-              this.emptyAllLivingFromHive((Player)null, this.level.getBlockState(this.getBlockPos()), BeeReleaseStatus.EMERGENCY);
+              this.emptyAllLivingFromHive(null, this.level.getBlockState(this.getBlockPos()), BeeReleaseStatus.EMERGENCY);
       }
       super.setChanged();
    }
@@ -99,9 +96,8 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       List<Entity> list = this.releaseAllOccupants(p_58750_, p_58751_);
       if (p_58749_ != null) {
          for(Entity entity : list) {
-            if (entity instanceof CommonBee) {
-               CommonBee bee = (CommonBee)entity;
-               if (p_58749_.position().distanceToSqr(entity.position()) <= 16.0D) {
+            if (entity instanceof CommonBee bee) {
+                if (p_58749_.position().distanceToSqr(entity.position()) <= 16.0D) {
                   if (!this.isSedated()) {
                      bee.setTarget(p_58749_);
                   } else {
@@ -156,8 +152,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
          commonBee.save(compoundtag);
          this.storeBee(compoundtag, tickInHive, p_58746_);
          if (this.level != null) {
-            if (commonBee instanceof CommonBee) {
-               CommonBee bee = (CommonBee)commonBee;
+            if (commonBee instanceof CommonBee bee) {
                 if (this.getCurrentProduction().is(Items.AIR)){
                     this.setCurrentProduction(bee.getFlowerProduction());
                 }
@@ -167,7 +162,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
             }
 
             BlockPos blockpos = this.getBlockPos();
-            this.level.playSound((Player)null, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), SoundEvents.BEEHIVE_ENTER, SoundSource.BLOCKS, 1.0F, 1.0F);
+            this.level.playSound(null, blockpos.getX(), blockpos.getY(), blockpos.getZ(), SoundEvents.BEEHIVE_ENTER, SoundSource.BLOCKS, 1.0F, 1.0F);
             this.level.gameEvent(GameEvent.BLOCK_CHANGE, blockpos, GameEvent.Context.of(commonBee, this.getBlockState()));
          }
 
@@ -204,9 +199,10 @@ public class MysteriousBeehiveEntity extends BlockEntity {
                if (p_155142_ == MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED) {
                   bee.dropOffNectar();
                   int i = getHoneyLevel(blockState);
-                  if (i < 5) {
+                  MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) level.getBlockEntity(blockPos);
+                  if (mysteriousBeehiveEntity != null && i < mysteriousBeehiveEntity.MAX_HONEY_LEVEL) {
                       int j = level.random.nextInt(100) == 0 ? 2 : 1;
-                      if (i + j > 5)
+                      if (i + j > mysteriousBeehiveEntity.MAX_HONEY_LEVEL)
                           --j;
                       level.setBlockAndUpdate(blockPos, blockState.setValue(MysteriousBeehive.HONEY_LEVEL, Integer.valueOf(i + j)));
                   }
@@ -224,7 +220,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
                double d2 = (double)blockPos.getZ() + 0.5D + d3 * (double)direction.getStepZ();
                entity.moveTo(d0, d1, d2, entity.getYRot(), entity.getXRot());
 
-               level.playSound((Player)null, blockPos, SoundEvents.BEEHIVE_EXIT, SoundSource.BLOCKS, 1.0F, 1.0F);
+               level.playSound(null, blockPos, SoundEvents.BEEHIVE_EXIT, SoundSource.BLOCKS, 1.0F, 1.0F);
                level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(entity, level.getBlockState(blockPos)));
                return level.addFreshEntity(entity);
             } else {
@@ -265,7 +261,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
   //        System.out.printf("Ticks in hive : %d\n", MysteriousBeehiveEntity$beedata.ticksInHive);
          if (MysteriousBeehiveEntity$beedata.ticksInHive > MysteriousBeehiveEntity$beedata.minOccupationTicks) {
             MysteriousBeehiveEntity.BeeReleaseStatus MysteriousBeehiveEntity$beereleasestatus = MysteriousBeehiveEntity$beedata.entityData.getBoolean("HasNectar") ? MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED : MysteriousBeehiveEntity.BeeReleaseStatus.BEE_RELEASED;
-            if (releaseOccupant(level, blockPos, blockState, MysteriousBeehiveEntity$beedata, (List<Entity>)null, MysteriousBeehiveEntity$beereleasestatus, flowerPos)) {
+            if (releaseOccupant(level, blockPos, blockState, MysteriousBeehiveEntity$beedata, null, MysteriousBeehiveEntity$beereleasestatus, flowerPos)) {
                flag = true;
                iterator.remove();
             }
@@ -283,9 +279,9 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       tickOccupants(level, pos, state, entity.stored, entity.savedFlowerPos);
       if (!entity.stored.isEmpty() && level.getRandom().nextDouble() < 0.005D) {
          double d0 = (double)pos.getX() + 0.5D;
-         double d1 = (double)pos.getY();
+         double d1 = pos.getY();
          double d2 = (double)pos.getZ() + 0.5D;
-         level.playSound((Player)null, d0, d1, d2, SoundEvents.BEEHIVE_WORK, SoundSource.BLOCKS, 1.0F, 1.0F);
+         level.playSound(null, d0, d1, d2, SoundEvents.BEEHIVE_WORK, SoundSource.BLOCKS, 1.0F, 1.0F);
       }
    }
 
@@ -301,6 +297,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
             MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata = new MysteriousBeehiveEntity.BeeData(compoundtag.getCompound("EntityData"), compoundtag.getInt("TicksInHive"), compoundtag.getInt("MinOccupationTicks"));
             this.stored.add(MysteriousBeehiveEntity$beedata);
         }
+        this.MAX_HONEY_LEVEL = tag.getInt("MaxLevel");
 
         this.savedFlowerPos = null;
         if (tag.contains("FlowerPos")) {
@@ -310,8 +307,9 @@ public class MysteriousBeehiveEntity extends BlockEntity {
 
     @Override
    public void saveAdditional(CompoundTag tag) {
-        System.out.printf("Saving Mysterious beehive\n");
-      tag.put("Bees", this.writeBees());
+        System.out.print("Saving Mysterious beehive\n");
+        tag.put("Bees", this.writeBees());
+        tag.putInt("MaxLevel", MAX_HONEY_LEVEL);
       if (this.hasSavedFlowerPos()) {
          tag.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
       }
@@ -348,10 +346,10 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       }
    }
 
-   public static enum BeeReleaseStatus {
+   public enum BeeReleaseStatus {
       HONEY_DELIVERED,
       BEE_RELEASED,
-      EMERGENCY;
+      EMERGENCY
    }
 }
 

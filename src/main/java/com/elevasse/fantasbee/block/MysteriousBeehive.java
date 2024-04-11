@@ -29,7 +29,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class MysteriousBeehive extends Block implements EntityBlock {
-    public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 5);
+    public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 25);
     public static final IntegerProperty HIVE_LEVEL = IntegerProperty.create("hive_level", 0, 5);
     public static Property<Direction> FACING = DirectionProperty.create("facing");
 
@@ -53,19 +53,21 @@ public class MysteriousBeehive extends Block implements EntityBlock {
             if (entity instanceof MysteriousBeehiveEntity) {
                 if (hand == InteractionHand.MAIN_HAND) {
                     if (held.is(Items.AIR)) {
-                        System.out.printf("Current honey level : %d\n", ((MysteriousBeehiveEntity) entity).getHoneyLevel(blockstate));
+                        System.out.printf("Current honey level : %d\n", MysteriousBeehiveEntity.getHoneyLevel(blockstate));
                         System.out.printf("Current production : %s\n", (((MysteriousBeehiveEntity) entity).getCurrentProduction().getDisplayName().getString()));
                         System.out.printf("Current hive level : %d\n", blockstate.getValue(MysteriousBeehive.HIVE_LEVEL));
                     }
                     else if (held.is(Items.SHEARS)){
                         if (blockstate.getValue(HONEY_LEVEL) >= 5) {
-                            popResource(level, pos, new ItemStack(((MysteriousBeehiveEntity) entity).getCurrentProduction().getItem()));
+                            for (int i = ((MysteriousBeehiveEntity) entity).getMaxHoneyLevel() / 5; i > 0; i--)
+                                popResource(level, pos, new ItemStack(((MysteriousBeehiveEntity) entity).getCurrentProduction().getItem()));
                             level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HONEY_LEVEL, 0));
                         }
                     }
-/*                    else {
-                        ((MysteriousBeehiveEntity) entity).setCurrentProduction(held.getItem().getDefaultInstance());
-                    }*/
+                    else if (held.is(Items.IRON_AXE) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 0){
+                        level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 1));
+                        ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(10);
+                    }
                     return InteractionResult.SUCCESS;
                 }
             }
@@ -86,7 +88,6 @@ public class MysteriousBeehive extends Block implements EntityBlock {
         blockStateBuilder.add(FACING);
     }
 
-    // MobSlayerBlock.java
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
