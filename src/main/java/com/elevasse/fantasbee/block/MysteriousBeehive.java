@@ -111,6 +111,7 @@ public class MysteriousBeehive extends Block implements EntityBlock {
         blockStateBuilder.add(HONEY_LEVEL);
         blockStateBuilder.add(HIVE_LEVEL);
         blockStateBuilder.add(FACING);
+        blockStateBuilder.add(HAS_HONEY);
     }
 
     @Nullable
