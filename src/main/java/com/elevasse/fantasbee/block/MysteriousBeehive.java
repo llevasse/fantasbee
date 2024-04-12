@@ -74,22 +74,20 @@ public class MysteriousBeehive extends Block implements EntityBlock {
                     else if (held.is(Items.COPPER_INGOT) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 0){
                         level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 1));
                         ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(10);
-                        ((MysteriousBeehiveEntity) entity).setMaxOccupants(6);
                     }
                     else if (held.is(Items.IRON_INGOT) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 1){
                         level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 2));
                         ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(15);
-                        ((MysteriousBeehiveEntity) entity).setMaxOccupants(7);
+                        ((MysteriousBeehiveEntity) entity).setMaxOccupants(6);
                     }
                     else if (held.is(Items.GOLD_INGOT) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 2){
                         level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 3));
                         ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(20);
-                        ((MysteriousBeehiveEntity) entity).setMaxOccupants(8);
                     }
                     else if (held.is(Items.DIAMOND) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 3){
                         level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HIVE_LEVEL, 4));
                         ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(25);
-                        ((MysteriousBeehiveEntity) entity).setMaxOccupants(9);
+                        ((MysteriousBeehiveEntity) entity).setMaxOccupants(7);
                     }
                     else
                         return InteractionResult.FAIL;
