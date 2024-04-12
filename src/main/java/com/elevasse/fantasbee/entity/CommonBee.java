@@ -115,6 +115,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
         this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, 16.0F);
         this.setPathfindingMalus(BlockPathTypes.COCOA, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.FENCE, -1.0F);
+        this.gathering_level = 0;
     }
 
     public CommonBee(ServerLevel level, double x, double y, double z) {
@@ -160,6 +161,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    public static final String TAG_HAS_NECTAR = "HasNectar";
    public static final String TAG_FLOWER_POS = "FlowerPos";
    public static final String TAG_HIVE_POS = "HivePos";
+   public static final String TAG_GATHERING_LVL = "GatheringLvl";
    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
    @Nullable
    private UUID persistentAngerTarget;
@@ -181,6 +183,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    BeeGoToHiveGoal goToHiveGoal;
    private BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
    private int underWaterTicks;
+   private int gathering_level;
 
    private ItemStack flowerProduction = Items.AIR.getDefaultInstance();
 
@@ -217,43 +220,43 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       this.targetSelector.addGoal(2, new BeeBecomeAngryTargetGoal(this));
       this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, true));
    }
-   
-   public void addAdditionalSaveData(CompoundTag p_27823_) {
-      super.addAdditionalSaveData(p_27823_);
-      if (this.hasHive()) {
-         p_27823_.put("HivePos", NbtUtils.writeBlockPos(this.getHivePos()));
-      }
 
-      if (this.hasSavedFlowerPos()) {
-         p_27823_.put("FlowerPos", NbtUtils.writeBlockPos(this.getSavedFlowerPos()));
-      }
+   public void addAdditionalSaveData(CompoundTag tag) {
+      super.addAdditionalSaveData(tag);
+      if (this.hasHive())
+         tag.put(TAG_HIVE_POS, NbtUtils.writeBlockPos(this.getHivePos()));
 
-      p_27823_.putBoolean("HasNectar", this.hasNectar());
-      p_27823_.putBoolean("HasStung", this.hasStung());
-      p_27823_.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);
-      p_27823_.putInt("CannotEnterHiveTicks", this.stayOutOfHiveCountdown);
-      p_27823_.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
-      this.addPersistentAngerSaveData(p_27823_);
+      if (this.hasSavedFlowerPos())
+         tag.put(TAG_FLOWER_POS, NbtUtils.writeBlockPos(this.getSavedFlowerPos()));
+
+      tag.putBoolean(TAG_HAS_NECTAR, this.hasNectar());
+      tag.putBoolean("HasStung", this.hasStung());
+      tag.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);
+      tag.putInt("CannotEnterHiveTicks", this.stayOutOfHiveCountdown);
+      tag.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
+      tag.putInt(TAG_GATHERING_LVL, this.gathering_level);
+      this.addPersistentAngerSaveData(tag);
    }
 
-   public void readAdditionalSaveData(CompoundTag p_27793_) {
+   public void readAdditionalSaveData(CompoundTag tag) {
       this.hivePos = null;
-      if (p_27793_.contains("HivePos")) {
-         this.hivePos = NbtUtils.readBlockPos(p_27793_.getCompound("HivePos"));
+      if (tag.contains(TAG_HIVE_POS)) {
+         this.hivePos = NbtUtils.readBlockPos(tag.getCompound(TAG_HIVE_POS));
       }
 
       this.savedFlowerPos = null;
-      if (p_27793_.contains("FlowerPos")) {
-         this.savedFlowerPos = NbtUtils.readBlockPos(p_27793_.getCompound("FlowerPos"));
+      if (tag.contains(TAG_FLOWER_POS)) {
+         this.savedFlowerPos = NbtUtils.readBlockPos(tag.getCompound(TAG_FLOWER_POS));
       }
 
-      super.readAdditionalSaveData(p_27793_);
-      this.setHasNectar(p_27793_.getBoolean("HasNectar"));
-      this.setHasStung(p_27793_.getBoolean("HasStung"));
-      this.ticksWithoutNectarSinceExitingHive = p_27793_.getInt("TicksSincePollination");
-      this.stayOutOfHiveCountdown = p_27793_.getInt("CannotEnterHiveTicks");
-      this.numCropsGrownSincePollination = p_27793_.getInt("CropsGrownSincePollination");
-      this.readPersistentAngerSaveData(this.level, p_27793_);
+      super.readAdditionalSaveData(tag);
+      this.setHasNectar(tag.getBoolean(TAG_HAS_NECTAR));
+      this.setHasStung(tag.getBoolean("HasStung"));
+      this.ticksWithoutNectarSinceExitingHive = tag.getInt("TicksSincePollination");
+      this.stayOutOfHiveCountdown = tag.getInt("CannotEnterHiveTicks");
+      this.numCropsGrownSincePollination = tag.getInt("CropsGrownSincePollination");
+      this.gathering_level = tag.getInt(TAG_GATHERING_LVL);
+      this.readPersistentAngerSaveData(this.level, tag);
    }
 
    public boolean doHurtTarget(Entity p_27722_) {
@@ -697,6 +700,13 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       this.flowerProduction = flowerProduction;
    }
 
+   public int getGathering_level() {
+      return gathering_level;
+   }
+
+   public void setGathering_level(int gathering_level) {
+      this.gathering_level = gathering_level;
+   }
 
    abstract class BaseBeeGoal extends Goal {
       public abstract boolean canBeeUse();
