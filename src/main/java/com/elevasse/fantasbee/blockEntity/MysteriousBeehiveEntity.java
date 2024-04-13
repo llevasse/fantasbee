@@ -199,7 +199,11 @@ public class MysteriousBeehiveEntity extends BlockEntity {
                   int i = getHoneyLevel(blockState);
                   MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) level.getBlockEntity(blockPos);
                   if (mysteriousBeehiveEntity != null && i < mysteriousBeehiveEntity.MaxHoneyLevel) {
-                      int j = level.random.nextInt(100 / bee.getGathering_level()) == 0 ? 2 : 1;
+                      int j;
+                      if (bee.getGathering_level() != 0)
+                          j = level.random.nextInt(100 / bee.getGathering_level()) == 0 ? 2 : 1;
+                      else
+                          j = level.random.nextInt(100) == 0 ? 2 : 1;
                       if (i + j > mysteriousBeehiveEntity.MaxHoneyLevel)
                           --j;
                       if (i + j == mysteriousBeehiveEntity.MaxHoneyLevel)
