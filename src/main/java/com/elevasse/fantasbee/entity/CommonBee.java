@@ -105,37 +105,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidType;
 
 public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
-    public CommonBee(EntityType<CommonBee> type, Level level) {
-        super(type, level);
-
-        this.moveControl = new FlyingMoveControl(this, 20, true);
-        this.lookControl = new BeeLookControl(this);
-        this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
-        this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
-        this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, 16.0F);
-        this.setPathfindingMalus(BlockPathTypes.COCOA, -1.0F);
-        this.setPathfindingMalus(BlockPathTypes.FENCE, -1.0F);
-        this.gathering_level = 0;
-    }
-
-    public CommonBee(ServerLevel level, double x, double y, double z) {
-        this(RefEntities.COMMON_BEE.get(), level);
-        setPos(x, y, z);
-    }
-    public CommonBee(ServerLevel level, BlockPos blockPos) {
-        this(level, blockPos.getX(), blockPos.getY(), blockPos.getZ());
-    }
-
-    @Nullable
-    @Override
-    public CommonBee getBreedOffspring(ServerLevel p_148760_, AgeableMob p_148761_) {
-        return new CommonBee(p_148760_, this.blockPosition());
-    }
-
-    public static boolean canSpawn(EntityType<CommonBee> entityType, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random){
-        return Animal.checkAnimalSpawnRules(entityType, level, spawnType, pos, random) && !level.getLevelData().isRaining();
-    }
-
    public static final float FLAP_DEGREES_PER_TICK = 120.32113F;
    public static final int TICKS_PER_FLAP = Mth.ceil(1.4959966F);
    private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(Bee.class, EntityDataSerializers.BYTE);
@@ -184,9 +153,49 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    private BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
    private int underWaterTicks;
    private int gathering_level;
+   private int max_gathering_level = 15;
 
    private ItemStack flowerProduction = Items.AIR.getDefaultInstance();
 
+
+   public CommonBee(EntityType<CommonBee> type, Level level) {
+        super(type, level);
+
+        this.moveControl = new FlyingMoveControl(this, 20, true);
+        this.lookControl = new BeeLookControl(this);
+        this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
+        this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
+        this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, 16.0F);
+        this.setPathfindingMalus(BlockPathTypes.COCOA, -1.0F);
+        this.setPathfindingMalus(BlockPathTypes.FENCE, -1.0F);
+        this.gathering_level = 0;
+    }
+
+    public CommonBee(ServerLevel level, double x, double y, double z) {
+        this(RefEntities.COMMON_BEE.get(), level);
+        setPos(x, y, z);
+    }
+    public CommonBee(ServerLevel level, BlockPos blockPos) {
+        this(level, blockPos.getX(), blockPos.getY(), blockPos.getZ());
+    }
+
+    @Nullable
+    @Override
+    public CommonBee getBreedOffspring(ServerLevel level, AgeableMob parent) {
+      int _gatheringLvl = ((CommonBee) parent).getGathering_level();
+       CommonBee bee = new CommonBee(level, this.blockPosition());
+      if (_gatheringLvl < max_gathering_level) {
+         int rng = level.random.nextInt(5);
+         _gatheringLvl += rng == 0 ? 1 : 0;
+      }
+       System.out.printf("new bee with gatheringLvl = %d\n", _gatheringLvl);
+      bee.setGathering_level(_gatheringLvl);
+      return (bee);
+    }
+
+    public static boolean canSpawn(EntityType<CommonBee> entityType, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random){
+        return Animal.checkAnimalSpawnRules(entityType, level, spawnType, pos, random) && !level.getLevelData().isRaining();
+    }
 
    protected void defineSynchedData() {
       super.defineSynchedData();
