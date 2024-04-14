@@ -5,11 +5,12 @@ import com.elevasse.fantasbee.blockEntity.MysteriousBeehiveEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -21,24 +22,18 @@ import com.google.common.collect.Lists;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
-import net.minecraft.core.BlockPos;
+
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.protocol.game.DebugPackets;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.PoiTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.TimeUtil;
@@ -48,10 +43,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobType;
@@ -77,39 +70,33 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.AirAndWaterRandomPos;
 import net.minecraft.world.entity.ai.util.AirRandomPos;
 import net.minecraft.world.entity.ai.util.HoverRandomPos;
-import net.minecraft.world.entity.ai.village.poi.PoiManager;
-import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.SweetBerryBushBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidType;
 
 public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    public static final float FLAP_DEGREES_PER_TICK = 120.32113F;
    public static final int TICKS_PER_FLAP = Mth.ceil(1.4959966F);
-   private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(Bee.class, EntityDataSerializers.BYTE);
-   private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(Bee.class, EntityDataSerializers.INT);
-   private static final int FLAG_ROLL = 2;
+   private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(CommonBee.class, EntityDataSerializers.BYTE);
+   private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(CommonBee.class, EntityDataSerializers.INT);
+   private static final EntityDataAccessor<Integer> GATHERING_LVL = SynchedEntityData.defineId(CommonBee.class, EntityDataSerializers.INT);
+   /*private static final int FLAG_ROLL = 2;
    private static final int FLAG_HAS_STUNG = 4;
    private static final int FLAG_HAS_NECTAR = 8;
    private static final int STING_DEATH_COUNTDOWN = 1200;
@@ -126,7 +113,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    public static final String TAG_CROPS_GROWN_SINCE_POLLINATION = "CropsGrownSincePollination";
    public static final String TAG_CANNOT_ENTER_HIVE_TICKS = "CannotEnterHiveTicks";
    public static final String TAG_TICKS_SINCE_POLLINATION = "TicksSincePollination";
-   public static final String TAG_HAS_STUNG = "HasStung";
+   public static final String TAG_HAS_STUNG = "HasStung";*/
    public static final String TAG_HAS_NECTAR = "HasNectar";
    public static final String TAG_FLOWER_POS = "FlowerPos";
    public static final String TAG_HIVE_POS = "HivePos";
@@ -152,8 +139,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    BeeGoToHiveGoal goToHiveGoal;
    private BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
    private int underWaterTicks;
-   private int gathering_level;
-   private int max_gathering_level = 15;
+   int gathering_level = 40;
+   int max_gathering_level = 50;
 
    private ItemStack flowerProduction = Items.AIR.getDefaultInstance();
 
@@ -168,15 +155,19 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
         this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, 16.0F);
         this.setPathfindingMalus(BlockPathTypes.COCOA, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.FENCE, -1.0F);
-        this.gathering_level = 0;
-    }
+        System.out.printf("first commonBee GatheringLvl : %d\n", this.getGathering_level());
+      this.gathering_level = 40;
+   }
 
     public CommonBee(ServerLevel level, double x, double y, double z) {
         this(RefEntities.COMMON_BEE.get(), level);
         setPos(x, y, z);
+        System.out.printf("second commonBee GatheringLvl : %d\n", this.getGathering_level());
     }
+
     public CommonBee(ServerLevel level, BlockPos blockPos) {
         this(level, blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        System.out.printf("third commonBee GatheringLvl : %d\n", this.getGathering_level());
     }
 
     @Nullable
@@ -188,7 +179,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          int rng = level.random.nextInt(5);
          _gatheringLvl += rng == 0 ? 1 : 0;
       }
-       System.out.printf("new bee with gatheringLvl = %d\n", _gatheringLvl);
       bee.setGathering_level(_gatheringLvl);
       return (bee);
     }
@@ -201,10 +191,20 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       super.defineSynchedData();
       this.entityData.define(DATA_FLAGS_ID, (byte)0);
       this.entityData.define(DATA_REMAINING_ANGER_TIME, 0);
+      this.entityData.define(GATHERING_LVL, 40);
    }
 
    public float getWalkTargetValue(BlockPos p_27788_, LevelReader p_27789_) {
       return p_27789_.getBlockState(p_27788_).isAir() ? 10.0F : 0.0F;
+   }
+
+   @Override
+   public InteractionResult mobInteract(Player player, InteractionHand hand) {
+      if (hand == InteractionHand.MAIN_HAND && player.getItemInHand(hand).is(Items.AIR)){
+         System.out.printf("gatheringLvl : %d\n", this.gathering_level);
+         this.gathering_level = 40;
+         }
+      return super.mobInteract(player, hand);
    }
 
    @Override
@@ -231,7 +231,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    public void addAdditionalSaveData(CompoundTag tag) {
-      super.addAdditionalSaveData(tag);
       if (this.hasHive())
          tag.put(TAG_HIVE_POS, NbtUtils.writeBlockPos(this.getHivePos()));
 
@@ -243,11 +242,13 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       tag.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);
       tag.putInt("CannotEnterHiveTicks", this.stayOutOfHiveCountdown);
       tag.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
-      tag.putInt(TAG_GATHERING_LVL, this.gathering_level);
+      tag.putInt(TAG_GATHERING_LVL, this.getGathering_level());
       this.addPersistentAngerSaveData(tag);
+      super.addAdditionalSaveData(tag);
    }
 
    public void readAdditionalSaveData(CompoundTag tag) {
+      super.readAdditionalSaveData(tag);
       this.hivePos = null;
       if (tag.contains(TAG_HIVE_POS)) {
          this.hivePos = NbtUtils.readBlockPos(tag.getCompound(TAG_HIVE_POS));
@@ -258,13 +259,12 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          this.savedFlowerPos = NbtUtils.readBlockPos(tag.getCompound(TAG_FLOWER_POS));
       }
 
-      super.readAdditionalSaveData(tag);
       this.setHasNectar(tag.getBoolean(TAG_HAS_NECTAR));
       this.setHasStung(tag.getBoolean("HasStung"));
       this.ticksWithoutNectarSinceExitingHive = tag.getInt("TicksSincePollination");
       this.stayOutOfHiveCountdown = tag.getInt("CannotEnterHiveTicks");
       this.numCropsGrownSincePollination = tag.getInt("CropsGrownSincePollination");
-      this.gathering_level = tag.getInt(TAG_GATHERING_LVL);
+      this.setGathering_level(tag.getInt(TAG_GATHERING_LVL));
       this.readPersistentAngerSaveData(this.level, tag);
    }
 
@@ -702,7 +702,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    public ItemStack getFlowerProduction() {
-      return flowerProduction;
+      return this.flowerProduction;
    }
 
    public void setFlowerProduction(ItemStack flowerProduction) {
@@ -710,10 +710,11 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    public int getGathering_level() {
-      return gathering_level;
+      return this.gathering_level;
    }
 
    public void setGathering_level(int gathering_level) {
+      if (gathering_level <= max_gathering_level)
       this.gathering_level = gathering_level;
    }
 
@@ -776,7 +777,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
             BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
             if (blockentity instanceof MysteriousBeehiveEntity) {
                MysteriousBeehiveEntity beehiveblockentity = (MysteriousBeehiveEntity)blockentity;
-//               System.out.printf("EnterHiveGoal\n");
                if (!beehiveblockentity.isFull() && CommonBee.this.checkHiveReciprocity(CommonBee.this.hivePos)) {
                   return true;
                }
@@ -795,7 +795,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       public void start() {
          BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
          if (blockentity instanceof MysteriousBeehiveEntity beehiveblockentity) {
-            beehiveblockentity.addOccupant(CommonBee.this, CommonBee.this.hasNectar());
+            System.out.printf("CommonBee BeeEnterHiveGoal start GatheringLvl : %d\n", CommonBee.this.gathering_level);
+            beehiveblockentity.addOccupant(CommonBee.this, CommonBee.this.hasNectar(), CommonBee.this.gathering_level);
          }
 
       }
