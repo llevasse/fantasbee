@@ -139,7 +139,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    BeeGoToHiveGoal goToHiveGoal;
    private BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
    private int underWaterTicks;
-   int gathering_level = 40;
+   int gathering_level;
    int max_gathering_level = 50;
 
    private ItemStack flowerProduction = Items.AIR.getDefaultInstance();
@@ -155,19 +155,16 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
         this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, 16.0F);
         this.setPathfindingMalus(BlockPathTypes.COCOA, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.FENCE, -1.0F);
-        System.out.printf("first commonBee GatheringLvl : %d\n", this.getGathering_level());
-      this.gathering_level = 40;
+        this.gathering_level = 0;
    }
 
     public CommonBee(ServerLevel level, double x, double y, double z) {
         this(RefEntities.COMMON_BEE.get(), level);
         setPos(x, y, z);
-        System.out.printf("second commonBee GatheringLvl : %d\n", this.getGathering_level());
     }
 
     public CommonBee(ServerLevel level, BlockPos blockPos) {
         this(level, blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        System.out.printf("third commonBee GatheringLvl : %d\n", this.getGathering_level());
     }
 
     @Nullable
@@ -176,9 +173,10 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       int _gatheringLvl = ((CommonBee) parent).getGathering_level();
        CommonBee bee = new CommonBee(level, this.blockPosition());
       if (_gatheringLvl < max_gathering_level) {
-         int rng = level.random.nextInt(5);
+         int rng = level.random.nextInt(3);
          _gatheringLvl += rng == 0 ? 1 : 0;
       }
+       System.out.printf("Child gatheringLvl : %d\n", _gatheringLvl);
       bee.setGathering_level(_gatheringLvl);
       return (bee);
     }
@@ -191,7 +189,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       super.defineSynchedData();
       this.entityData.define(DATA_FLAGS_ID, (byte)0);
       this.entityData.define(DATA_REMAINING_ANGER_TIME, 0);
-      this.entityData.define(GATHERING_LVL, 40);
    }
 
    public float getWalkTargetValue(BlockPos p_27788_, LevelReader p_27789_) {
@@ -202,7 +199,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    public InteractionResult mobInteract(Player player, InteractionHand hand) {
       if (hand == InteractionHand.MAIN_HAND && player.getItemInHand(hand).is(Items.AIR)){
          System.out.printf("gatheringLvl : %d\n", this.gathering_level);
-         this.gathering_level = 40;
          }
       return super.mobInteract(player, hand);
    }
