@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 public class MysteriousBeehive extends Block implements EntityBlock {
     public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 25);
     public static final IntegerProperty HIVE_LEVEL = IntegerProperty.create("hive_level", 0, 4);
-    public static final BooleanProperty HAS_HONEY = BooleanProperty.create("has_honey");
+    public static final IntegerProperty HAS_HONEY = IntegerProperty.create("has_honey", 0, 1);
     public static Property<Direction> FACING = DirectionProperty.create("facing");
 
     public MysteriousBeehive(Properties properties) {
@@ -40,7 +40,7 @@ public class MysteriousBeehive extends Block implements EntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(HONEY_LEVEL, 0));
         this.registerDefaultState(this.stateDefinition.any().setValue(HIVE_LEVEL, 0));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
-        this.registerDefaultState(this.stateDefinition.any().setValue(HAS_HONEY, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(HAS_HONEY, 0));
     }
 
     @Override
@@ -61,14 +61,14 @@ public class MysteriousBeehive extends Block implements EntityBlock {
                         System.out.printf("Current hive level : %d\n", blockstate.getValue(MysteriousBeehive.HIVE_LEVEL));
                     }
                     else if (held.is(Items.SHEARS)){
-                        if (blockstate.getValue(HAS_HONEY)) {
+                        if (blockstate.getValue(HAS_HONEY) == 1) {
                             int hLvl = ((MysteriousBeehiveEntity) entity).getMaxHoneyLevel();
                             for (int i = hLvl / 5; i > 0; i--) {
                                 popResource(level, pos, new ItemStack(((MysteriousBeehiveEntity) entity).getCurrentProduction().getItem()));
                                 hLvl -= 5;
                             }
                             level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HONEY_LEVEL, hLvl));
-                            level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HAS_HONEY, false));
+                            level.setBlockAndUpdate(pos, blockstate.setValue(MysteriousBeehive.HAS_HONEY, 0));
                         }
                     }
                     else if (held.is(Items.COPPER_INGOT) && blockstate.getValue(MysteriousBeehive.HIVE_LEVEL) == 0){

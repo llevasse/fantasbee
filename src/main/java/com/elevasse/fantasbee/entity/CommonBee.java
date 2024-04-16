@@ -596,7 +596,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    boolean isFlowerValid(BlockPos p_27897_) {
-      return this.level.isLoaded(p_27897_) && this.level.getBlockState(p_27897_).is(RefBlocks.IRON_FLOWER.get());
+      BlockState state = this.level.getBlockState(p_27897_);
+      return (state.is(RefBlocks.IRON_FLOWER.get()) || state.is(RefBlocks.COAL_FLOWER.get()));
    }
 
    protected void playStepSound(BlockPos p_27820_, BlockState p_27821_) {
@@ -791,7 +792,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       public void start() {
          BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
          if (blockentity instanceof MysteriousBeehiveEntity beehiveblockentity) {
-            System.out.printf("CommonBee BeeEnterHiveGoal start GatheringLvl : %d\n", CommonBee.this.gathering_level);
             beehiveblockentity.addOccupant(CommonBee.this, CommonBee.this.hasNectar(), CommonBee.this.gathering_level);
          }
 
@@ -1110,7 +1110,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       private final Predicate<BlockState> VALID_POLLINATION_BLOCKS = (blockState) -> {
          if (blockState.hasProperty(BlockStateProperties.WATERLOGGED) && blockState.getValue(BlockStateProperties.WATERLOGGED)) {
             return false;
-         } else if (blockState.is(RefBlocks.IRON_FLOWER.get())) {
+         } else if (blockState.is(RefBlocks.IRON_FLOWER.get()) || blockState.is(RefBlocks.COAL_FLOWER.get())) {
             return true;
          } else {
             return false;
@@ -1192,7 +1192,10 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
       public void stop() {
          if (this.hasPollinatedLongEnough()) {
-            if (CommonBee.this.level.getBlockState(CommonBee.this.savedFlowerPos).is(RefBlocks.IRON_FLOWER.get()))
+            BlockState state = CommonBee.this.level.getBlockState(CommonBee.this.savedFlowerPos);
+            if (state.is(RefBlocks.COAL_FLOWER.get()))
+               CommonBee.this.setFlowerProduction(Items.COAL.getDefaultInstance());
+            else if (state.is(RefBlocks.IRON_FLOWER.get()))
                CommonBee.this.setFlowerProduction(Items.IRON_NUGGET.getDefaultInstance());
             else
                CommonBee.this.setFlowerProduction(Items.HONEYCOMB.getDefaultInstance());

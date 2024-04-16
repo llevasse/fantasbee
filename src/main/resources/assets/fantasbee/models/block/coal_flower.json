@@ -1,7 +1,7 @@
 {
   "parent": "block/cross",
   "textures": {
-    "cross": "fantasbee:block/iron_flower"
+    "cross": "fantasbee:block/coal_flower"
   },
   "render_type": "cutout"
 }
