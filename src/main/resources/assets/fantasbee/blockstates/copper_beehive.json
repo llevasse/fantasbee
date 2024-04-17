@@ -1,32 +1,167 @@
 {
   "variants": {
-    "facing=east,honey_level<5": {
+    "facing=east,honey_level=0": {
       "model": "fantasbee:block/copper_beehive",
       "y": 90
     },
-    "facing=east,honey_level>=5": {
+    "facing=east,honey_level=1": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 90
+    },
+    "facing=east,honey_level=2": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 90
+    },
+    "facing=east,honey_level=3": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 90
+    },
+    "facing=east,honey_level=4": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 90
+    },
+    "facing=east,honey_level=5": {
       "model": "fantasbee:block/copper_beehive_honey",
       "y": 90
     },
-    "facing=north,honey_level<5": {
+    "facing=east,honey_level=6": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 90
+    },
+    "facing=east,honey_level=7": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 90
+    },
+    "facing=east,honey_level=8": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 90
+    },
+    "facing=east,honey_level=9": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 90
+    },
+    "facing=east,honey_level=10": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 90
+    },
+    "facing=north,honey_level=0": {
       "model": "fantasbee:block/copper_beehive"
-    },    
-    "facing=north,honey_level>=5": {
+    },
+    "facing=north,honey_level=1": {
+      "model": "fantasbee:block/copper_beehive"
+    },
+    "facing=north,honey_level=2": {
+      "model": "fantasbee:block/copper_beehive"
+    },
+    "facing=north,honey_level=3": {
+      "model": "fantasbee:block/copper_beehive"
+    },
+    "facing=north,honey_level=4": {
+      "model": "fantasbee:block/copper_beehive"
+    },
+    "facing=north,honey_level=5": {
       "model": "fantasbee:block/copper_beehive_honey"
     },
-    "facing=south,honey_level<5": {
+    "facing=north,honey_level=6": {
+      "model": "fantasbee:block/copper_beehive_honey"
+    },
+    "facing=north,honey_level=7": {
+      "model": "fantasbee:block/copper_beehive_honey"
+    },
+    "facing=north,honey_level=8": {
+      "model": "fantasbee:block/copper_beehive_honey"
+    },
+    "facing=north,honey_level=9": {
+      "model": "fantasbee:block/copper_beehive_honey"
+    },
+    "facing=north,honey_level=10": {
+      "model": "fantasbee:block/copper_beehive_honey"
+    },
+    "facing=south,honey_level=0": {
       "model": "fantasbee:block/copper_beehive",
       "y": 180
     },
-    "facing=south,honey_level>=5": {
+    "facing=south,honey_level=1": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 180
+    },
+    "facing=south,honey_level=2": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 180
+    },
+    "facing=south,honey_level=3": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 180
+    },
+    "facing=south,honey_level=4": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 180
+    },
+    "facing=south,honey_level=5": {
       "model": "fantasbee:block/copper_beehive_honey",
       "y": 180
     },
-    "facing=west,honey_level<5": {
+    "facing=south,honey_level=6": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 180
+    },
+    "facing=south,honey_level=7": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 180
+    },
+    "facing=south,honey_level=8": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 180
+    },
+    "facing=south,honey_level=9": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 180
+    },
+    "facing=south,honey_level=10": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 180
+    },
+    "facing=west,honey_level=0": {
       "model": "fantasbee:block/copper_beehive",
       "y": 270
     },
-    "facing=west,honey_level>=5": {
+    "facing=west,honey_level=1": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 270
+    },
+    "facing=west,honey_level=2": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 270
+    },
+    "facing=west,honey_level=3": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 270
+    },
+    "facing=west,honey_level=4": {
+      "model": "fantasbee:block/copper_beehive",
+      "y": 270
+    },
+    "facing=west,honey_level=5": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 270
+    },
+    "facing=west,honey_level=6": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 270
+    },
+    "facing=west,honey_level=7": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 270
+    },
+    "facing=west,honey_level=8": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 270
+    },
+    "facing=west,honey_level=9": {
+      "model": "fantasbee:block/copper_beehive_honey",
+      "y": 270
+    },
+    "facing=west,honey_level=10": {
       "model": "fantasbee:block/copper_beehive_honey",
       "y": 270
     }
