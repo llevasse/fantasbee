@@ -16,5 +16,7 @@ public class RefBlockEntity {
 
     public static final RegistryObject<BlockEntityType<MysteriousBeehiveEntity>> MYSTERIOUS_BEEHIVE = BLOCKS_ENTITIES.register("mysterious_beehive",
             () -> BlockEntityType.Builder.of(MysteriousBeehiveEntity::new, RefBlocks.MYSTERIOUS_BEEHIVE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<MysteriousBeehiveEntity>> COPPER_BEEHIVE = BLOCKS_ENTITIES.register("copper_beehive",
+            () -> BlockEntityType.Builder.of(MysteriousBeehiveEntity::new, RefBlocks.COPPER_BEEHIVE.get()).build(null));
     public static void register(IEventBus eventBus) { BLOCKS_ENTITIES.register(eventBus);}
 }
