@@ -24,11 +24,11 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class CopperBeehive extends Block implements EntityBlock {
-    public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 10);
+public class IronBeehive extends Block implements EntityBlock {
+    public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 15);
     public static Property<Direction> FACING = DirectionProperty.create("facing");
 
-    public CopperBeehive(Properties properties) {
+    public IronBeehive(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(HONEY_LEVEL, 0));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
@@ -57,12 +57,12 @@ public class CopperBeehive extends Block implements EntityBlock {
                                 popResource(level, pos, new ItemStack(((CommonBeehiveEntity) entity).getCurrentProduction().getItem()));
                                 hLvl -= 5;
                             }
-                            level.setBlockAndUpdate(pos, blockstate.setValue(CopperBeehive.HONEY_LEVEL, hLvl));
+                            level.setBlockAndUpdate(pos, blockstate.setValue(IronBeehive.HONEY_LEVEL, hLvl));
                         }
                     }
                     else if (held.is(Items.IRON_INGOT)){
-                        level.setBlockAndUpdate(pos, RefBlocks.IRON_BEEHIVE.get().defaultBlockState().setValue(HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(FACING, blockstate.getValue(FACING)));
                         ((CommonBeehiveEntity) entity).setMaxHoneyLevel(15);
+                        ((CommonBeehiveEntity) entity).setMaxOccupants(6);
                     }
                     else
                         return InteractionResult.FAIL;
@@ -76,7 +76,7 @@ public class CopperBeehive extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return RefBlockEntity.COPPER_BEEHIVE.get().create(blockPos, blockState);
+        return RefBlockEntity.IRON_BEEHIVE.get().create(blockPos, blockState);
     }
 
     @Override
@@ -88,6 +88,6 @@ public class CopperBeehive extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return type == RefBlockEntity.COPPER_BEEHIVE.get() ? CommonBeehiveEntity::serverTick : null;
+        return type == RefBlockEntity.IRON_BEEHIVE.get() ? CommonBeehiveEntity::serverTick : null;
     }
 }

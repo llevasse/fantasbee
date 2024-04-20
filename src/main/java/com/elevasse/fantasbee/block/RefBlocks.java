@@ -28,6 +28,7 @@ public class RefBlocks {
 
     public static final RegistryObject<Block> MYSTERIOUS_BEEHIVE = registerBlock("common_beehive", () -> new CommonBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
     public static final RegistryObject<Block> COPPER_BEEHIVE = registerBlock("copper_beehive", () -> new CommonBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
+    public static final RegistryObject<Block> IRON_BEEHIVE = registerBlock("iron_beehive", () -> new CommonBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
 
     public static final RegistryObject<Block> IRON_FLOWER = registerBlock("iron_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
     public static final RegistryObject<Block> COAL_FLOWER = registerBlock("coal_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));

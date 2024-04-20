@@ -18,5 +18,8 @@ public class RefBlockEntity {
             () -> BlockEntityType.Builder.of(CommonBeehiveEntity::new, RefBlocks.MYSTERIOUS_BEEHIVE.get()).build(null));
     public static final RegistryObject<BlockEntityType<CommonBeehiveEntity>> COPPER_BEEHIVE = BLOCKS_ENTITIES.register("copper_beehive",
             () -> BlockEntityType.Builder.of(CommonBeehiveEntity::new, RefBlocks.COPPER_BEEHIVE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CommonBeehiveEntity>> IRON_BEEHIVE = BLOCKS_ENTITIES.register("iron_beehive",
+            () -> BlockEntityType.Builder.of(CommonBeehiveEntity::new, RefBlocks.IRON_BEEHIVE.get()).build(null));
+
     public static void register(IEventBus eventBus) { BLOCKS_ENTITIES.register(eventBus);}
 }
