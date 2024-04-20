@@ -66,10 +66,7 @@ public class MysteriousBeehive extends Block implements EntityBlock {
                         }
                     }
                     else if (held.is(Items.COPPER_INGOT)){
-                        BlockState newBlock = RefBlocks.COPPER_BEEHIVE.get().defaultBlockState();
-                        level.setBlockAndUpdate(pos, newBlock);
-                        newBlock = level.getBlockState(pos);
-                        level.setBlockAndUpdate(pos, newBlock.setValue(HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(FACING, blockstate.getValue(FACING)));
+                        level.setBlockAndUpdate(pos, RefBlocks.COPPER_BEEHIVE.get().defaultBlockState().setValue(HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(FACING, blockstate.getValue(FACING)));
                         ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(10);
                     }
                     else
