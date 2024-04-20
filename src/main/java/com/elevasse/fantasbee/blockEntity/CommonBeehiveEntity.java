@@ -1,7 +1,7 @@
 package com.elevasse.fantasbee.blockEntity;
 
 import com.elevasse.fantasbee.entity.CommonBee;
-import com.elevasse.fantasbee.block.MysteriousBeehive;
+import com.elevasse.fantasbee.block.CommonBeehive;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class MysteriousBeehiveEntity extends BlockEntity {
+public class CommonBeehiveEntity extends BlockEntity {
     private ItemStack currentProduction;
 
     public static final String TAG_FLOWER_POS = "FlowerPos";
@@ -46,7 +46,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
     private int MaxHoneyLevel;
     private int MaxOccupants;
 
-    public MysteriousBeehiveEntity(BlockPos pos, BlockState state) {
+    public CommonBeehiveEntity(BlockPos pos, BlockState state) {
         super(RefBlockEntity.MYSTERIOUS_BEEHIVE.get(), pos, state);
         currentProduction = Items.AIR.getDefaultInstance();
         MaxHoneyLevel = 5;
@@ -91,7 +91,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       return this.stored.size() == this.MaxOccupants;
    }
 
-   public void emptyAllLivingFromHive(@Nullable Player p_58749_, BlockState p_58750_, MysteriousBeehiveEntity.BeeReleaseStatus p_58751_) {
+   public void emptyAllLivingFromHive(@Nullable Player p_58749_, BlockState p_58750_, CommonBeehiveEntity.BeeReleaseStatus p_58751_) {
       List<Entity> list = this.releaseAllOccupants(p_58750_, p_58751_);
       if (p_58749_ != null) {
          for(Entity entity : list) {
@@ -109,7 +109,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
 
    }
 
-   private List<Entity> releaseAllOccupants(BlockState blockState, MysteriousBeehiveEntity.BeeReleaseStatus beeReleaseStatus) {
+   private List<Entity> releaseAllOccupants(BlockState blockState, CommonBeehiveEntity.BeeReleaseStatus beeReleaseStatus) {
       List<Entity> list = Lists.newArrayList();
       this.stored.removeIf((beeData) -> {
           if (this.level != null) {
@@ -133,7 +133,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
    }
 
    public static int getHoneyLevel(BlockState p_58753_) {
-      return p_58753_.getValue(MysteriousBeehive.HONEY_LEVEL);
+      return p_58753_.getValue(CommonBeehive.HONEY_LEVEL);
    }
 
    public boolean isSedated() {
@@ -169,21 +169,21 @@ public class MysteriousBeehiveEntity extends BlockEntity {
    }
 
    public void storeBee(CompoundTag tag, int ticksInHive, boolean minTickOccupation, int gatheringLevel) {
-      this.stored.add(new MysteriousBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 3 : 1, gatheringLevel)); //default 2400 : 600
+      this.stored.add(new CommonBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 3 : 1, gatheringLevel)); //default 2400 : 600
    }
 
-   private static boolean releaseOccupant(Level level, BlockPos blockPos, BlockState blockState, MysteriousBeehiveEntity.BeeData beeData, @Nullable List<Entity> entityList, MysteriousBeehiveEntity.BeeReleaseStatus p_155142_, @Nullable BlockPos flowerPos) {
-      if ((level.isNight() || level.isRaining()) && p_155142_ != MysteriousBeehiveEntity.BeeReleaseStatus.EMERGENCY) {
+   private static boolean releaseOccupant(Level level, BlockPos blockPos, BlockState blockState, CommonBeehiveEntity.BeeData beeData, @Nullable List<Entity> entityList, CommonBeehiveEntity.BeeReleaseStatus p_155142_, @Nullable BlockPos flowerPos) {
+      if ((level.isNight() || level.isRaining()) && p_155142_ != CommonBeehiveEntity.BeeReleaseStatus.EMERGENCY) {
          return false;
       } else {
          CompoundTag compoundtag = beeData.entityData.copy();
          removeIgnoredBeeTags(compoundtag);
          compoundtag.put("HivePos", NbtUtils.writeBlockPos(blockPos));
          compoundtag.putBoolean("NoGravity", true);
-         Direction direction = blockState.getValue(MysteriousBeehive.FACING);
+         Direction direction = blockState.getValue(CommonBeehive.FACING);
          BlockPos blockpos = blockPos.relative(direction);
          boolean flag = !level.getBlockState(blockpos).getCollisionShape(level, blockpos).isEmpty();
-         if (flag && p_155142_ != MysteriousBeehiveEntity.BeeReleaseStatus.EMERGENCY) {
+         if (flag && p_155142_ != CommonBeehiveEntity.BeeReleaseStatus.EMERGENCY) {
             return false;
          } else {
             Entity entity = EntityType.loadEntityRecursive(compoundtag, level, (p_58740_) -> {
@@ -194,19 +194,19 @@ public class MysteriousBeehiveEntity extends BlockEntity {
                   bee.setSavedFlowerPos(flowerPos);
                }
                bee.setGathering_level(beeData.gatheringLvl);
-               if (p_155142_ == MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED) {
+               if (p_155142_ == CommonBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED) {
                   bee.dropOffNectar();
                   int i = getHoneyLevel(blockState);
-                  MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) level.getBlockEntity(blockPos);
-                  if (mysteriousBeehiveEntity != null && i < mysteriousBeehiveEntity.MaxHoneyLevel) {
+                  CommonBeehiveEntity commonBeehiveEntity = (CommonBeehiveEntity) level.getBlockEntity(blockPos);
+                  if (commonBeehiveEntity != null && i < commonBeehiveEntity.MaxHoneyLevel) {
                       int j;
                       if (bee.getGathering_level() != 0)
                           j = level.random.nextInt(100 / bee.getGathering_level()) == 0 ? 2 : 1;
                       else
                           j = level.random.nextInt(100) == 0 ? 2 : 1;
-                      if (i + j > mysteriousBeehiveEntity.MaxHoneyLevel)
+                      if (i + j > commonBeehiveEntity.MaxHoneyLevel)
                           --j;
-                      level.setBlockAndUpdate(blockPos, blockState.setValue(MysteriousBeehive.HONEY_LEVEL, i + j));
+                      level.setBlockAndUpdate(blockPos, blockState.setValue(CommonBeehive.HONEY_LEVEL, i + j));
                   }
                }
 
@@ -254,16 +254,16 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       return this.savedFlowerPos != null;
    }
 
-   private static void tickOccupants(Level level, BlockPos blockPos, BlockState blockState, List<MysteriousBeehiveEntity.BeeData> beeDataList, @Nullable BlockPos flowerPos) {
+   private static void tickOccupants(Level level, BlockPos blockPos, BlockState blockState, List<CommonBeehiveEntity.BeeData> beeDataList, @Nullable BlockPos flowerPos) {
       boolean flag = false;
 
-      MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata;
-      for(Iterator<BeeData> iterator = beeDataList.iterator(); iterator.hasNext(); ++MysteriousBeehiveEntity$beedata.ticksInHive) {
-         MysteriousBeehiveEntity$beedata = iterator.next();
-  //        System.out.printf("Ticks in hive : %d\n", MysteriousBeehiveEntity$beedata.ticksInHive);
-         if (MysteriousBeehiveEntity$beedata.ticksInHive > MysteriousBeehiveEntity$beedata.minOccupationTicks) {
-            MysteriousBeehiveEntity.BeeReleaseStatus MysteriousBeehiveEntity$beereleasestatus = MysteriousBeehiveEntity$beedata.entityData.getBoolean("HasNectar") ? MysteriousBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED : MysteriousBeehiveEntity.BeeReleaseStatus.BEE_RELEASED;
-            if (releaseOccupant(level, blockPos, blockState, MysteriousBeehiveEntity$beedata, null, MysteriousBeehiveEntity$beereleasestatus, flowerPos)) {
+      CommonBeehiveEntity.BeeData CommonBeehiveEntity$beedata;
+      for(Iterator<BeeData> iterator = beeDataList.iterator(); iterator.hasNext(); ++CommonBeehiveEntity$beedata.ticksInHive) {
+         CommonBeehiveEntity$beedata = iterator.next();
+  //        System.out.printf("Ticks in hive : %d\n", CommonBeehiveEntity$beedata.ticksInHive);
+         if (CommonBeehiveEntity$beedata.ticksInHive > CommonBeehiveEntity$beedata.minOccupationTicks) {
+            CommonBeehiveEntity.BeeReleaseStatus CommonBeehiveEntity$beereleasestatus = CommonBeehiveEntity$beedata.entityData.getBoolean("HasNectar") ? CommonBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED : CommonBeehiveEntity.BeeReleaseStatus.BEE_RELEASED;
+            if (releaseOccupant(level, blockPos, blockState, CommonBeehiveEntity$beedata, null, CommonBeehiveEntity$beereleasestatus, flowerPos)) {
                flag = true;
                iterator.remove();
             }
@@ -277,7 +277,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
    }
 
    public static <T extends BlockEntity> void serverTick(Level level, BlockPos pos, BlockState state, T t) {
-       MysteriousBeehiveEntity entity = (MysteriousBeehiveEntity) t;
+       CommonBeehiveEntity entity = (CommonBeehiveEntity) t;
       tickOccupants(level, pos, state, entity.stored, entity.savedFlowerPos);
       if (!entity.stored.isEmpty() && level.getRandom().nextDouble() < 0.005D) {
          double d0 = (double)pos.getX() + 0.5D;
@@ -296,11 +296,11 @@ public class MysteriousBeehiveEntity extends BlockEntity {
         this.currentProduction = ItemStack.of(tag.getCompound("Production"));
         for(int i = 0; i < listtag.size(); ++i) {
             CompoundTag compoundtag = listtag.getCompound(i);
-            MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata = new MysteriousBeehiveEntity.BeeData(compoundtag.getCompound("EntityData"),
+            CommonBeehiveEntity.BeeData CommonBeehiveEntity$beedata = new CommonBeehiveEntity.BeeData(compoundtag.getCompound("EntityData"),
                     compoundtag.getInt("TicksInHive"),
                     compoundtag.getInt("MinOccupationTicks"),
                     compoundtag.getInt(CommonBee.TAG_GATHERING_LVL));
-            this.stored.add(MysteriousBeehiveEntity$beedata);
+            this.stored.add(CommonBeehiveEntity$beedata);
         }
         this.MaxHoneyLevel = tag.getInt("MaxLevel");
         this.MaxOccupants = tag.getInt("MaxOccupant");
@@ -313,7 +313,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
 
     @Override
    public void saveAdditional(CompoundTag tag) {
-        System.out.print("Saving Mysterious beehive\n");
+        System.out.print("Saving Common beehive\n");
         tag.put("Bees", this.writeBees());
         tag.putInt("MaxLevel", MaxHoneyLevel);
         tag.putInt("MaxOccupant", MaxOccupants);
@@ -327,14 +327,14 @@ public class MysteriousBeehiveEntity extends BlockEntity {
    public ListTag writeBees() {
       ListTag listtag = new ListTag();
 
-      for(MysteriousBeehiveEntity.BeeData MysteriousBeehiveEntity$beedata : this.stored) {
-         CompoundTag compoundtag = MysteriousBeehiveEntity$beedata.entityData.copy();
+      for(CommonBeehiveEntity.BeeData CommonBeehiveEntity$beedata : this.stored) {
+         CompoundTag compoundtag = CommonBeehiveEntity$beedata.entityData.copy();
          compoundtag.remove("UUID");
          CompoundTag compoundtag1 = new CompoundTag();
          compoundtag1.put("EntityData", compoundtag);
-         compoundtag1.putInt("TicksInHive", MysteriousBeehiveEntity$beedata.ticksInHive);
-         compoundtag1.putInt("MinOccupationTicks", MysteriousBeehiveEntity$beedata.minOccupationTicks);
-         compoundtag1.putInt(CommonBee.TAG_GATHERING_LVL, MysteriousBeehiveEntity$beedata.gatheringLvl);
+         compoundtag1.putInt("TicksInHive", CommonBeehiveEntity$beedata.ticksInHive);
+         compoundtag1.putInt("MinOccupationTicks", CommonBeehiveEntity$beedata.minOccupationTicks);
+         compoundtag1.putInt(CommonBee.TAG_GATHERING_LVL, CommonBeehiveEntity$beedata.gatheringLvl);
          listtag.add(compoundtag1);
       }
 
@@ -348,7 +348,7 @@ public class MysteriousBeehiveEntity extends BlockEntity {
       final int minOccupationTicks;
 
       BeeData(CompoundTag tag, int ticksInHive, int minTicksOccupation, int gatheringLvl) {
-         MysteriousBeehiveEntity.removeIgnoredBeeTags(tag);
+         CommonBeehiveEntity.removeIgnoredBeeTags(tag);
          this.entityData = tag;
          this.ticksInHive = ticksInHive;
          this.gatheringLvl = gatheringLvl;

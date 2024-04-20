@@ -1,6 +1,6 @@
 package com.elevasse.fantasbee.block;
 
-import com.elevasse.fantasbee.blockEntity.MysteriousBeehiveEntity;
+import com.elevasse.fantasbee.blockEntity.CommonBeehiveEntity;
 import com.elevasse.fantasbee.blockEntity.RefBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,25 +44,25 @@ public class CopperBeehive extends Block implements EntityBlock {
         if (!level.isClientSide()) {
             ItemStack held = player.getItemInHand(hand);
             BlockEntity entity = level.getBlockEntity(pos);
-            if (entity instanceof MysteriousBeehiveEntity) {
+            if (entity instanceof CommonBeehiveEntity) {
                 if (hand == InteractionHand.MAIN_HAND) {
                     if (held.is(Items.AIR)) {
-                        System.out.printf("Current honey level : %d\n", MysteriousBeehiveEntity.getHoneyLevel(blockstate));
-                        System.out.printf("Current production : %s\n", (((MysteriousBeehiveEntity) entity).getCurrentProduction().getDisplayName().getString()));
+                        System.out.printf("Current honey level : %d\n", CommonBeehiveEntity.getHoneyLevel(blockstate));
+                        System.out.printf("Current production : %s\n", (((CommonBeehiveEntity) entity).getCurrentProduction().getDisplayName().getString()));
                     }
                     else if (held.is(Items.SHEARS)){
                         if (blockstate.getValue(HONEY_LEVEL) >= 5) {
-                            int hLvl = ((MysteriousBeehiveEntity) entity).getMaxHoneyLevel();
+                            int hLvl = ((CommonBeehiveEntity) entity).getMaxHoneyLevel();
                             for (int i = hLvl / 5; i > 0; i--) {
-                                popResource(level, pos, new ItemStack(((MysteriousBeehiveEntity) entity).getCurrentProduction().getItem()));
+                                popResource(level, pos, new ItemStack(((CommonBeehiveEntity) entity).getCurrentProduction().getItem()));
                                 hLvl -= 5;
                             }
                             level.setBlockAndUpdate(pos, blockstate.setValue(CopperBeehive.HONEY_LEVEL, hLvl));
                         }
                     }
                     else if (held.is(Items.IRON_INGOT)){
-                        ((MysteriousBeehiveEntity) entity).setMaxHoneyLevel(15);
-                        ((MysteriousBeehiveEntity) entity).setMaxOccupants(6);
+                        ((CommonBeehiveEntity) entity).setMaxHoneyLevel(15);
+                        ((CommonBeehiveEntity) entity).setMaxOccupants(6);
                     }
                     else
                         return InteractionResult.FAIL;
@@ -88,6 +88,6 @@ public class CopperBeehive extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return type == RefBlockEntity.COPPER_BEEHIVE.get() ? MysteriousBeehiveEntity::serverTick : null;
+        return type == RefBlockEntity.COPPER_BEEHIVE.get() ? CommonBeehiveEntity::serverTick : null;
     }
 }

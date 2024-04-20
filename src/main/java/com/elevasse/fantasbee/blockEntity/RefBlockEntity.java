@@ -1,6 +1,6 @@
 package com.elevasse.fantasbee.blockEntity;
 
-import com.elevasse.fantasbee.block.MysteriousBeehive;
+import com.elevasse.fantasbee.block.CommonBeehive;
 import com.elevasse.fantasbee.block.RefBlocks;
 import com.elevasse.fantasbee.fantasbee;
 import net.minecraft.world.level.block.Block;
@@ -14,9 +14,9 @@ import net.minecraftforge.registries.RegistryObject;
 public class RefBlockEntity {
     public static final DeferredRegister<BlockEntityType<?>> BLOCKS_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, fantasbee.MODID);
 
-    public static final RegistryObject<BlockEntityType<MysteriousBeehiveEntity>> MYSTERIOUS_BEEHIVE = BLOCKS_ENTITIES.register("mysterious_beehive",
-            () -> BlockEntityType.Builder.of(MysteriousBeehiveEntity::new, RefBlocks.MYSTERIOUS_BEEHIVE.get()).build(null));
-    public static final RegistryObject<BlockEntityType<MysteriousBeehiveEntity>> COPPER_BEEHIVE = BLOCKS_ENTITIES.register("copper_beehive",
-            () -> BlockEntityType.Builder.of(MysteriousBeehiveEntity::new, RefBlocks.COPPER_BEEHIVE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CommonBeehiveEntity>> MYSTERIOUS_BEEHIVE = BLOCKS_ENTITIES.register("common_beehive",
+            () -> BlockEntityType.Builder.of(CommonBeehiveEntity::new, RefBlocks.MYSTERIOUS_BEEHIVE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CommonBeehiveEntity>> COPPER_BEEHIVE = BLOCKS_ENTITIES.register("copper_beehive",
+            () -> BlockEntityType.Builder.of(CommonBeehiveEntity::new, RefBlocks.COPPER_BEEHIVE.get()).build(null));
     public static void register(IEventBus eventBus) { BLOCKS_ENTITIES.register(eventBus);}
 }

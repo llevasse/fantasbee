@@ -26,8 +26,8 @@ public class RefBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, fantasbee.MODID);
 
 
-    public static final RegistryObject<Block> MYSTERIOUS_BEEHIVE = registerBlock("mysterious_beehive", () -> new MysteriousBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
-    public static final RegistryObject<Block> COPPER_BEEHIVE = registerBlock("copper_beehive", () -> new MysteriousBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
+    public static final RegistryObject<Block> MYSTERIOUS_BEEHIVE = registerBlock("common_beehive", () -> new CommonBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
+    public static final RegistryObject<Block> COPPER_BEEHIVE = registerBlock("copper_beehive", () -> new CommonBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
 
     public static final RegistryObject<Block> IRON_FLOWER = registerBlock("iron_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
     public static final RegistryObject<Block> COAL_FLOWER = registerBlock("coal_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));

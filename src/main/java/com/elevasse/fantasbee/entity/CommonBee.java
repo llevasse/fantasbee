@@ -1,7 +1,7 @@
 package com.elevasse.fantasbee.entity;
 
 import com.elevasse.fantasbee.block.RefBlocks;
-import com.elevasse.fantasbee.blockEntity.MysteriousBeehiveEntity;
+import com.elevasse.fantasbee.blockEntity.CommonBeehiveEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -423,7 +423,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          return false;
       } else {
          BlockEntity blockentity = this.level.getBlockEntity(this.hivePos);
-         return blockentity instanceof MysteriousBeehiveEntity && ((MysteriousBeehiveEntity)blockentity).isFireNearby();
+         return blockentity instanceof CommonBeehiveEntity && ((CommonBeehiveEntity)blockentity).isFireNearby();
       }
    }
 
@@ -450,8 +450,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
    private boolean doesHiveHaveSpace(BlockPos p_27885_) {
       BlockEntity blockentity = this.level.getBlockEntity(p_27885_);
-      if (blockentity instanceof MysteriousBeehiveEntity) {
-         return !((MysteriousBeehiveEntity)blockentity).isFull();
+      if (blockentity instanceof CommonBeehiveEntity) {
+         return !((CommonBeehiveEntity)blockentity).isFull();
       } else {
          return false;
       }
@@ -520,7 +520,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          return false;
       } else {
          BlockEntity blockentity = this.level.getBlockEntity(this.hivePos);
-         return blockentity instanceof MysteriousBeehiveEntity;
+         return blockentity instanceof CommonBeehiveEntity;
       }
    }
 
@@ -682,14 +682,14 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
       if (!CommonBee.this.hasSavedFlowerPos() || !CommonBee.this.hasNectar())
          return true;
-      MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) CommonBee.this.level.getBlockEntity(blockPos);
-      if (mysteriousBeehiveEntity == null) {
+      CommonBeehiveEntity commonBeehiveEntity = (CommonBeehiveEntity) CommonBee.this.level.getBlockEntity(blockPos);
+      if (commonBeehiveEntity == null) {
          return false;
       }
-      if (mysteriousBeehiveEntity.getCurrentProduction().is(Items.AIR))
+      if (commonBeehiveEntity.getCurrentProduction().is(Items.AIR))
          return true;
 //         System.out.printf("Flower production saved : %s\n", flowerProduction.getDisplayName().getString());
-      if (!mysteriousBeehiveEntity.getCurrentProduction().is(CommonBee.this.getFlowerProduction().getItem())) {
+      if (!commonBeehiveEntity.getCurrentProduction().is(CommonBee.this.getFlowerProduction().getItem())) {
          CommonBee.this.hivePos = null;
          CommonBee.this.remainingCooldownBeforeLocatingNewHive = 200;
 //            System.out.printf("Dropping hive :(\n");
@@ -772,8 +772,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       public boolean canBeeUse() {
          if (CommonBee.this.hasHive() && CommonBee.this.wantsToEnterHive() && CommonBee.this.hivePos.closerToCenterThan(CommonBee.this.position(), 2.0D)) {
             BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
-            if (blockentity instanceof MysteriousBeehiveEntity) {
-               MysteriousBeehiveEntity beehiveblockentity = (MysteriousBeehiveEntity)blockentity;
+            if (blockentity instanceof CommonBeehiveEntity) {
+               CommonBeehiveEntity beehiveblockentity = (CommonBeehiveEntity)blockentity;
                if (!beehiveblockentity.isFull() && CommonBee.this.checkHiveReciprocity(CommonBee.this.hivePos)) {
                   return true;
                }
@@ -791,7 +791,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
       public void start() {
          BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
-         if (blockentity instanceof MysteriousBeehiveEntity beehiveblockentity) {
+         if (blockentity instanceof CommonBeehiveEntity beehiveblockentity) {
             beehiveblockentity.addOccupant(CommonBee.this, CommonBee.this.hasNectar(), CommonBee.this.gathering_level);
          }
 
@@ -838,7 +838,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       public void tick() {
          if (CommonBee.this.hivePos != null) {
             ++this.travellingTicks;
-            MysteriousBeehiveEntity mysteriousBeehiveEntity = (MysteriousBeehiveEntity) CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
+            CommonBeehiveEntity commonBeehiveEntity = (CommonBeehiveEntity) CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
 //            System.out.printf("GoToHiveGoal\n");
             if (!CommonBee.this.checkHiveReciprocity(CommonBee.this.hivePos))
                return ;
