@@ -61,7 +61,7 @@ public class CopperBeehive extends Block implements EntityBlock {
                         }
                     }
                     else if (held.is(Items.IRON_INGOT)){
-                        level.setBlockAndUpdate(pos, RefBlocks.IRON_BEEHIVE.get().defaultBlockState().setValue(HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(FACING, blockstate.getValue(FACING)));
+                        level.setBlockAndUpdate(pos, RefBlocks.IRON_BEEHIVE.get().defaultBlockState().setValue(IronBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(IronBeehive.FACING, blockstate.getValue(FACING)));
                         ((CommonBeehiveEntity) entity).setMaxHoneyLevel(15);
                     }
                     else
