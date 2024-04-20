@@ -61,7 +61,7 @@ public class CommonBeehive extends Block implements EntityBlock {
                         }
                     }
                     else if (held.is(Items.COPPER_INGOT)){
-                        level.setBlockAndUpdate(pos, RefBlocks.COPPER_BEEHIVE.get().defaultBlockState().setValue(HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(FACING, blockstate.getValue(FACING)));
+                        level.setBlockAndUpdate(pos, RefBlocks.COPPER_BEEHIVE.get().defaultBlockState().setValue(CopperBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(CopperBeehive.FACING, blockstate.getValue(FACING)));
                         ((CommonBeehiveEntity) entity).setMaxHoneyLevel(10);
                     }
                     else
@@ -76,7 +76,7 @@ public class CommonBeehive extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return RefBlockEntity.MYSTERIOUS_BEEHIVE.get().create(blockPos, blockState);
+        return RefBlockEntity.COMMON_BEEHIVE.get().create(blockPos, blockState);
     }
 
     @Override
@@ -88,6 +88,6 @@ public class CommonBeehive extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return type == RefBlockEntity.MYSTERIOUS_BEEHIVE.get() ? CommonBeehiveEntity::serverTick : null;
+        return type == RefBlockEntity.COMMON_BEEHIVE.get() ? CommonBeehiveEntity::serverTick : null;
     }
 }

@@ -47,7 +47,7 @@ public class CommonBeehiveEntity extends BlockEntity {
     private int MaxOccupants;
 
     public CommonBeehiveEntity(BlockPos pos, BlockState state) {
-        super(RefBlockEntity.MYSTERIOUS_BEEHIVE.get(), pos, state);
+        super(RefBlockEntity.COMMON_BEEHIVE.get(), pos, state);
         currentProduction = Items.AIR.getDefaultInstance();
         MaxHoneyLevel = 5;
         MaxOccupants = 3;

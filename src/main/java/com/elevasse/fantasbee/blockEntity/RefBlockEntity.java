@@ -14,8 +14,8 @@ import net.minecraftforge.registries.RegistryObject;
 public class RefBlockEntity {
     public static final DeferredRegister<BlockEntityType<?>> BLOCKS_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, fantasbee.MODID);
 
-    public static final RegistryObject<BlockEntityType<CommonBeehiveEntity>> MYSTERIOUS_BEEHIVE = BLOCKS_ENTITIES.register("common_beehive",
-            () -> BlockEntityType.Builder.of(CommonBeehiveEntity::new, RefBlocks.MYSTERIOUS_BEEHIVE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CommonBeehiveEntity>> COMMON_BEEHIVE = BLOCKS_ENTITIES.register("common_beehive",
+            () -> BlockEntityType.Builder.of(CommonBeehiveEntity::new, RefBlocks.COMMON_BEEHIVE.get()).build(null));
     public static final RegistryObject<BlockEntityType<CommonBeehiveEntity>> COPPER_BEEHIVE = BLOCKS_ENTITIES.register("copper_beehive",
             () -> BlockEntityType.Builder.of(CommonBeehiveEntity::new, RefBlocks.COPPER_BEEHIVE.get()).build(null));
     public static final RegistryObject<BlockEntityType<CommonBeehiveEntity>> IRON_BEEHIVE = BLOCKS_ENTITIES.register("iron_beehive",

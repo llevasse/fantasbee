@@ -798,6 +798,16 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
    }
 
+   public boolean isHive(BlockState blockState){
+      if (blockState.is(RefBlocks.COMMON_BEEHIVE.get()))
+         return true;
+      if (blockState.is(RefBlocks.COPPER_BEEHIVE.get()))
+         return true;
+      if (blockState.is(RefBlocks.IRON_BEEHIVE.get()))
+         return true;
+      return false;
+   }
+
    @VisibleForDebug
    public class BeeGoToHiveGoal extends BaseBeeGoal {
       public static final int MAX_TRAVELLING_TICKS = 600;
@@ -814,7 +824,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       public boolean canBeeUse() {
-         return CommonBee.this.hivePos != null && !CommonBee.this.hasRestriction() && CommonBee.this.wantsToEnterHive() && !this.hasReachedTarget(CommonBee.this.hivePos) && CommonBee.this.level.getBlockState(CommonBee.this.hivePos).is(RefBlocks.MYSTERIOUS_BEEHIVE.get());
+         return CommonBee.this.hivePos != null && !CommonBee.this.hasRestriction() && CommonBee.this.wantsToEnterHive() && !this.hasReachedTarget(CommonBee.this.hivePos) && CommonBee.this.isHive(CommonBee.this.level.getBlockState(CommonBee.this.hivePos));
       }
 
       public boolean canBeeContinueToUse() {
