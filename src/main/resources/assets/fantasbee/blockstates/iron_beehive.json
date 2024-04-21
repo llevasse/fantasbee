@@ -45,19 +45,19 @@
       "y": 90
     },
     "facing=east,honey_level=11": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 90
     },
     "facing=east,honey_level=12": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 90
     },
     "facing=east,honey_level=13": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 90
     },
     "facing=east,honey_level=14": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 90
     },
     "facing=east,honey_level=15": {
@@ -95,19 +95,19 @@
       "model": "fantasbee:block/iron_beehive_honey"
     },
     "facing=north,honey_level=10": {
-      "model": "fantasbee:block/iron_beehive_honey"
+      "model": "fantasbee:block/iron_beehive_honey_honey"
     },
     "facing=north,honey_level=11": {
-      "model": "fantasbee:block/iron_beehive"
+      "model": "fantasbee:block/iron_beehive_honey"
     },
     "facing=north,honey_level=12": {
-      "model": "fantasbee:block/iron_beehive"
+      "model": "fantasbee:block/iron_beehive_honey"
     },
     "facing=north,honey_level=13": {
-      "model": "fantasbee:block/iron_beehive"
+      "model": "fantasbee:block/iron_beehive_honey"
     },
     "facing=north,honey_level=14": {
-      "model": "fantasbee:block/iron_beehive"
+      "model": "fantasbee:block/iron_beehive_honey"
     },
     "facing=north,honey_level=15": {
       "model": "fantasbee:block/iron_beehive_honey"
@@ -157,19 +157,19 @@
       "y": 180
     },
     "facing=south,honey_level=11": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 180
     },
     "facing=south,honey_level=12": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 180
     },
     "facing=south,honey_level=13": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 180
     },
     "facing=south,honey_level=14": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 180
     },
     "facing=south,honey_level=15": {
@@ -221,19 +221,19 @@
       "y": 270
     },
     "facing=west,honey_level=11": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 270
     },
     "facing=west,honey_level=12": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 270
     },
     "facing=west,honey_level=13": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 270
     },
     "facing=west,honey_level=14": {
-      "model": "fantasbee:block/iron_beehive",
+      "model": "fantasbee:block/iron_beehive_honey",
       "y": 270
     },
     "facing=west,honey_level=15": {
