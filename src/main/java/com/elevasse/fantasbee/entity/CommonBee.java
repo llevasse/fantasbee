@@ -232,7 +232,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       tag.putBoolean(TAG_HAS_NECTAR, this.hasNectar());
       tag.putBoolean("HasStung", this.hasStung());
       tag.putInt("TicksSincePollination", this.ticksWithoutNectarSinceExitingHive);
-      tag.putInt("CannotEnterHiveTicks", this.stayOutOfHiveCountdown);
+      tag.putInt(TAG_CANNOT_ENTER_HIVE_TICKS, this.stayOutOfHiveCountdown);
       tag.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
       tag.putInt(TAG_GATHERING_LVL, this.getGathering_level());
       this.addPersistentAngerSaveData(tag);
@@ -254,7 +254,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       this.setHasNectar(tag.getBoolean(TAG_HAS_NECTAR));
       this.setHasStung(tag.getBoolean("HasStung"));
       this.ticksWithoutNectarSinceExitingHive = tag.getInt("TicksSincePollination");
-      this.stayOutOfHiveCountdown = tag.getInt("CannotEnterHiveTicks");
+      this.stayOutOfHiveCountdown = tag.getInt(TAG_CANNOT_ENTER_HIVE_TICKS);
       this.numCropsGrownSincePollination = tag.getInt("CropsGrownSincePollination");
       this.setGathering_level(tag.getInt(TAG_GATHERING_LVL));
       this.readPersistentAngerSaveData(this.level, tag);
@@ -989,7 +989,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       public void tick() {
-         if (CommonBee.this.random.nextInt(this.adjustedTickDelay(30)) == 0) {
+         if (CommonBee.this.random.nextInt(this.adjustedTickDelay(GROW_CHANCE)) == 0) {
+            //System.out.printf("tick GrowCropGoal\n");
             for(int i = 1; i <= 2; ++i) {
                BlockPos blockpos = CommonBee.this.blockPosition().below(i);
                BlockState blockstate = CommonBee.this.level.getBlockState(blockpos);
@@ -1017,6 +1018,30 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                      }
                   } else if (blockstate.is(Blocks.CAVE_VINES) || blockstate.is(Blocks.CAVE_VINES_PLANT)) {
                      ((BonemealableBlock)blockstate.getBlock()).performBonemeal((ServerLevel)CommonBee.this.level, CommonBee.this.random, blockpos, blockstate);
+                  }
+                  else if (blockstate.is(BlockTags.FLOWERS) || (CommonBee.this.hasSavedFlowerPos() && blockstate.is(Blocks.GRASS_BLOCK))){
+                     int range = 2;
+                     BlockPos.MutableBlockPos mutableblockpos = new BlockPos.MutableBlockPos();
+                     //System.out.printf("beeGrowCropGoal searching for clear grass\n");
+
+
+                     int   x = blockpos.getX() - range, y = blockpos.getY() - range, z = blockpos.getZ() - range;
+                     for (int checkX = x; checkX <= x + (range * 2) + 1 && !flag; checkX++){
+                        for (int checkY = y; checkY <= y + (range * 2) + 1 && !flag; checkY++){
+                           for (int checkZ = z; checkZ <= z + (range * 2) + 1 && !flag; checkZ++){
+                              mutableblockpos.set(checkX,checkY,checkZ);
+                              BlockState check = level.getBlockState(mutableblockpos);
+                              if (check.isAir() && level.getBlockState(mutableblockpos.below()).is(Blocks.GRASS_BLOCK) && CommonBee.this.hasSavedFlowerPos()) {
+
+                                 CommonBee.this.level.setBlockAndUpdate(mutableblockpos, level.getBlockState(CommonBee.this.getSavedFlowerPos()));
+                                 //System.out.printf("beeGrowCropGoal birth flower\n");
+                                 CommonBee.this.incrementNumCropsGrownSincePollination();
+                                 flag = true;
+                              }
+                           }
+                        }
+                     }
+                     flag = false;
                   }
 
                   if (flag) {

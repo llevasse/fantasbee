@@ -100,7 +100,7 @@ public class CommonBeehiveEntity extends BlockEntity {
                   if (!this.isSedated()) {
                      bee.setTarget(p_58749_);
                   } else {
-                     bee.setStayOutOfHiveCountdown(400);
+                     bee.setStayOutOfHiveCountdown(MIN_TICKS_BEFORE_REENTERING_HIVE);
                   }
                }
             }
@@ -193,6 +193,7 @@ public class CommonBeehiveEntity extends BlockEntity {
                if (flowerPos != null && !bee.hasSavedFlowerPos() && level.random.nextFloat() < 0.9F) {
                   bee.setSavedFlowerPos(flowerPos);
                }
+               bee.setStayOutOfHiveCountdown(MIN_TICKS_BEFORE_REENTERING_HIVE);
                bee.setGathering_level(beeData.gatheringLvl);
                if (p_155142_ == CommonBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED) {
                   bee.dropOffNectar();
