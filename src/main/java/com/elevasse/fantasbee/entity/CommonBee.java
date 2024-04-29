@@ -74,15 +74,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.StemBlock;
-import net.minecraft.world.level.block.SweetBerryBushBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
@@ -1122,8 +1118,12 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       private final Predicate<BlockState> VALID_POLLINATION_BLOCKS = (blockState) -> {
          if (blockState.hasProperty(BlockStateProperties.WATERLOGGED) && blockState.getValue(BlockStateProperties.WATERLOGGED)) {
             return false;
-         } else if (blockState.is(RefBlocks.IRON_FLOWER.get()) || blockState.is(RefBlocks.COAL_FLOWER.get())) {
-            return true;
+         } else if (blockState.is(BlockTags.FLOWERS)) {
+            if (blockState.is(Blocks.SUNFLOWER)) {
+               return blockState.getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER;
+            } else {
+               return true;
+            }
          } else {
             return false;
          }
