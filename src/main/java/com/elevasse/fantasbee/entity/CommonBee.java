@@ -92,7 +92,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(CommonBee.class, EntityDataSerializers.BYTE);
    private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(CommonBee.class, EntityDataSerializers.INT);
    private static final EntityDataAccessor<Integer> GATHERING_LVL = SynchedEntityData.defineId(CommonBee.class, EntityDataSerializers.INT);
-   /*private static final int FLAG_ROLL = 2;
+   private static final int FLAG_ROLL = 2;
    private static final int FLAG_HAS_STUNG = 4;
    private static final int FLAG_HAS_NECTAR = 8;
    private static final int STING_DEATH_COUNTDOWN = 1200;
@@ -109,7 +109,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    public static final String TAG_CROPS_GROWN_SINCE_POLLINATION = "CropsGrownSincePollination";
    public static final String TAG_CANNOT_ENTER_HIVE_TICKS = "CannotEnterHiveTicks";
    public static final String TAG_TICKS_SINCE_POLLINATION = "TicksSincePollination";
-   public static final String TAG_HAS_STUNG = "HasStung";*/
+   public static final String TAG_HAS_STUNG = "HasStung";
    public static final String TAG_HAS_NECTAR = "HasNectar";
    public static final String TAG_FLOWER_POS = "FlowerPos";
    public static final String TAG_HIVE_POS = "HivePos";
@@ -268,9 +268,9 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
             ((LivingEntity)p_27722_).setStingerCount(((LivingEntity)p_27722_).getStingerCount() + 1);
             int i = 0;
             if (this.level.getDifficulty() == Difficulty.NORMAL) {
-               i = 10;
+               i = POISON_SECONDS_NORMAL;
             } else if (this.level.getDifficulty() == Difficulty.HARD) {
-               i = 18;
+               i = POISON_SECONDS_HARD;
             }
 
             if (i > 0) {
@@ -288,7 +288,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
    public void tick() {
       super.tick();
-      if (this.hasNectar() && this.getCropsGrownSincePollination() < 10 && this.random.nextFloat() < 0.05F) {
+      if (this.hasNectar() && this.getCropsGrownSincePollination() < MAX_CROPS_GROWABLE && this.random.nextFloat() < 0.05F) {
          for(int i = 0; i < this.random.nextInt(2) + 1; ++i) {
             this.spawnFluidParticle(this.level, this.getX() - (double)0.3F, this.getX() + (double)0.3F, this.getZ() - (double)0.3F, this.getZ() + (double)0.3F, this.getY(0.5D), ParticleTypes.FALLING_NECTAR);
          }
@@ -351,7 +351,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    private boolean isTiredOfLookingForNectar() {
-      return this.ticksWithoutNectarSinceExitingHive > 3600;
+      return this.ticksWithoutNectarSinceExitingHive > TICKS_WITHOUT_NECTAR_BEFORE_GOING_HOME;
    }
 
    boolean wantsToEnterHive() {
@@ -395,7 +395,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
       if (flag) {
          ++this.timeSinceSting;
-         if (this.timeSinceSting % 5 == 0 && this.random.nextInt(Mth.clamp(1200 - this.timeSinceSting, 1, 1200)) == 0) {
+         if (this.timeSinceSting % 5 == 0 && this.random.nextInt(Mth.clamp(STING_DEATH_COUNTDOWN - this.timeSinceSting, 1, STING_DEATH_COUNTDOWN)) == 0) {
             this.hurt(this.damageSources().generic(), this.getHealth());
          }
       }
@@ -500,7 +500,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
             --this.remainingCooldownBeforeLocatingNewFlower;
          }
 
-         boolean flag = this.isAngry() && !this.hasStung() && this.getTarget() != null && this.getTarget().distanceToSqr(this) < 4.0D;
+         boolean flag = this.isAngry() && !this.hasStung() && this.getTarget() != null && this.getTarget().distanceToSqr(this) < MIN_ATTACK_DIST;
          this.setRolling(flag);
          if (this.tickCount % 20 == 0 && !this.isHiveValid()) {
             this.hivePos = null;
@@ -521,7 +521,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    public boolean hasNectar() {
-      return this.getFlag(8);
+      return this.getFlag(FLAG_HAS_NECTAR);
    }
 
    void setHasNectar(boolean p_27920_) {
@@ -529,15 +529,15 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          this.resetTicksWithoutNectarSinceExitingHive();
       }
 
-      this.setFlag(8, p_27920_);
+      this.setFlag(FLAG_HAS_NECTAR, p_27920_);
    }
 
    public boolean hasStung() {
-      return this.getFlag(4);
+      return this.getFlag(FLAG_HAS_STUNG);
    }
 
    private void setHasStung(boolean p_27926_) {
-      this.setFlag(4, p_27926_);
+      this.setFlag(FLAG_HAS_STUNG, p_27926_);
    }
 
    private boolean isRolling() {
@@ -549,7 +549,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    boolean isTooFarAway(BlockPos p_27890_) {
-      return !this.closerThan(p_27890_, 32);
+      return !this.closerThan(p_27890_, TOO_FAR_DISTANCE);
    }
 
    private void setFlag(int p_27833_, boolean p_27834_) {
@@ -853,7 +853,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
             if (this.travellingTicks > this.adjustedTickDelay(600)) {
                this.dropAndBlacklistHive();
             } else if (!CommonBee.this.navigation.isInProgress()) {
-               if (!CommonBee.this.closerThan(CommonBee.this.hivePos, 16)) {
+               if (!CommonBee.this.closerThan(CommonBee.this.hivePos, PATHFIND_TO_HIVE_WHEN_CLOSER_THAN)) {
                   if (CommonBee.this.isTooFarAway(CommonBee.this.hivePos)) {
                      this.dropHive();
                   } else {
@@ -915,7 +915,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       private boolean hasReachedTarget(BlockPos p_28002_) {
-         if (CommonBee.this.closerThan(p_28002_, 2)) {
+         if (CommonBee.this.closerThan(p_28002_, HIVE_CLOSE_ENOUGH_DISTANCE)) {
             return true;
          } else {
             Path path = CommonBee.this.navigation.getPath();
@@ -967,7 +967,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       }
 
       private boolean wantsToGoToKnownFlower() {
-         return CommonBee.this.ticksWithoutNectarSinceExitingHive > 2400;
+         return CommonBee.this.ticksWithoutNectarSinceExitingHive > TICKS_BEFORE_GOING_TO_KNOWN_FLOWER;
       }
    }
 
@@ -975,7 +975,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       static final int GROW_CHANCE = 30;
 
       public boolean canBeeUse() {
-         if (CommonBee.this.getCropsGrownSincePollination() >= 10) {
+         if (CommonBee.this.getCropsGrownSincePollination() >= MAX_CROPS_GROWABLE) {
             return false;
          } else if (CommonBee.this.random.nextFloat() < 0.3F) {
             return false;
@@ -1080,7 +1080,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       private List<BlockPos> findNearbyHivesWithSpace() {
          BlockPos blockpos = CommonBee.this.blockPosition();
          List<BlockPos> list = new ArrayList<>();
-         int   range = 8;
+         int   range = HIVE_SEARCH_DISTANCE / 2;
          int   x = blockpos.getX() - range, y = blockpos.getY() - range, z = blockpos.getZ() - range;
          for (int checkX = x; checkX <= x + (range * 2) + 1; checkX++){
             for (int checkY = y; checkY <= y + (range * 2) + 1; checkY++){
@@ -1159,7 +1159,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                CommonBee.this.navigation.moveTo((double)CommonBee.this.savedFlowerPos.getX() + 0.5D, (double)CommonBee.this.savedFlowerPos.getY() + 0.5D, (double)CommonBee.this.savedFlowerPos.getZ() + 0.5D, (double)1.2F);
                return true;
             } else {
-               CommonBee.this.remainingCooldownBeforeLocatingNewFlower = Mth.nextInt(CommonBee.this.random, 20, 60);
+               CommonBee.this.remainingCooldownBeforeLocatingNewFlower = Mth.nextInt(CommonBee.this.random, MIN_FIND_FLOWER_RETRY_COOLDOWN, MAX_FIND_FLOWER_RETRY_COOLDOWN);
                return false;
             }
          }
