@@ -807,7 +807,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          return true;
       if (blockState.is(RefBlocks.GOLD_BEEHIVE.get()))
          return true;
-      return false;
+      return (blockState.is(RefBlocks.DIAMOND_BEEHIVE.get()));
    }
 
    @VisibleForDebug

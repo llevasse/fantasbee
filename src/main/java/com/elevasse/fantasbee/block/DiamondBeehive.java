@@ -24,11 +24,11 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class GoldBeehive extends Block implements EntityBlock {
-    public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 20);
+public class DiamondBeehive extends Block implements EntityBlock {
+    public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 25);
     public static Property<Direction> FACING = DirectionProperty.create("facing");
 
-    public GoldBeehive(Properties properties) {
+    public DiamondBeehive(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(HONEY_LEVEL, 0));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
@@ -57,12 +57,8 @@ public class GoldBeehive extends Block implements EntityBlock {
                                 popResource(level, pos, new ItemStack(((CommonBeehiveEntity) entity).getCurrentProduction().getItem()));
                                 hLvl -= 5;
                             }
-                            level.setBlockAndUpdate(pos, blockstate.setValue(GoldBeehive.HONEY_LEVEL, hLvl));
+                            level.setBlockAndUpdate(pos, blockstate.setValue(DiamondBeehive.HONEY_LEVEL, hLvl));
                         }
-                    }
-                    else if (held.is(Items.DIAMOND)){
-                        level.setBlockAndUpdate(pos, RefBlocks.DIAMOND_BEEHIVE.get().defaultBlockState().setValue(DiamondBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(DiamondBeehive.FACING, blockstate.getValue(FACING)));
-                        ((CommonBeehiveEntity) entity).setMaxHoneyLevel(20);
                     }
                     else
                         return InteractionResult.FAIL;
@@ -76,7 +72,7 @@ public class GoldBeehive extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return RefBlockEntity.GOLD_BEEHIVE.get().create(blockPos, blockState);
+        return RefBlockEntity.IRON_BEEHIVE.get().create(blockPos, blockState);
     }
 
     @Override
@@ -88,6 +84,6 @@ public class GoldBeehive extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return type == RefBlockEntity.GOLD_BEEHIVE.get() ? CommonBeehiveEntity::serverTick : null;
+        return type == RefBlockEntity.IRON_BEEHIVE.get() ? CommonBeehiveEntity::serverTick : null;
     }
 }
