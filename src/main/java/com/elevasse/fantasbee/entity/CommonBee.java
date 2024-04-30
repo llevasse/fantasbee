@@ -114,6 +114,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    public static final String TAG_FLOWER_POS = "FlowerPos";
    public static final String TAG_HIVE_POS = "HivePos";
    public static final String TAG_GATHERING_LVL = "GatheringLvl";
+   public static final String TAG_GROW_LVL = "GrowLvl";
    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
    @Nullable
    private UUID persistentAngerTarget;
@@ -136,7 +137,9 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    private BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
    private int underWaterTicks;
    int gathering_level;
-   int max_gathering_level = 50;
+   final int max_gathering_level = 50;
+   int grow_level;
+   final int max_grow_level = 6;
 
    private ItemStack flowerProduction = Items.AIR.getDefaultInstance();
 
@@ -152,6 +155,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
         this.setPathfindingMalus(BlockPathTypes.COCOA, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.FENCE, -1.0F);
         this.gathering_level = 0;
+        this.grow_level = 0;
    }
 
     public CommonBee(ServerLevel level, double x, double y, double z) {
@@ -167,13 +171,19 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
     @Override
     public CommonBee getBreedOffspring(ServerLevel level, AgeableMob parent) {
       int _gatheringLvl = ((CommonBee) parent).getGathering_level();
+      int _growLvl = ((CommonBee) parent).getGrow_level();
        CommonBee bee = new CommonBee(level, this.blockPosition());
       if (_gatheringLvl < max_gathering_level) {
          int rng = level.random.nextInt(3);
          _gatheringLvl += rng == 0 ? 1 : 0;
       }
+      if (_growLvl < max_grow_level) {
+          int rng = level.random.nextInt(3);
+          _growLvl += rng == 0 ? 1 : 0;
+      }
        System.out.printf("Child gatheringLvl : %d\n", _gatheringLvl);
       bee.setGathering_level(_gatheringLvl);
+      bee.setGrow_level(_growLvl);
       return (bee);
     }
 
@@ -195,6 +205,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    public InteractionResult mobInteract(Player player, InteractionHand hand) {
       if (hand == InteractionHand.MAIN_HAND && player.getItemInHand(hand).is(Items.AIR)){
          System.out.printf("gatheringLvl : %d\n", this.gathering_level);
+         System.out.printf("growLvl : %d\n", this.grow_level);
          }
       return super.mobInteract(player, hand);
    }
@@ -235,6 +246,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       tag.putInt(TAG_CANNOT_ENTER_HIVE_TICKS, this.stayOutOfHiveCountdown);
       tag.putInt("CropsGrownSincePollination", this.numCropsGrownSincePollination);
       tag.putInt(TAG_GATHERING_LVL, this.getGathering_level());
+      tag.putInt(TAG_GROW_LVL, this.getGrow_level());
       this.addPersistentAngerSaveData(tag);
       super.addAdditionalSaveData(tag);
    }
@@ -257,6 +269,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       this.stayOutOfHiveCountdown = tag.getInt(TAG_CANNOT_ENTER_HIVE_TICKS);
       this.numCropsGrownSincePollination = tag.getInt("CropsGrownSincePollination");
       this.setGathering_level(tag.getInt(TAG_GATHERING_LVL));
+      this.setGrow_level(tag.getInt(TAG_GROW_LVL));
       this.readPersistentAngerSaveData(this.level, tag);
    }
 
@@ -708,7 +721,16 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
 
    public void setGathering_level(int gathering_level) {
       if (gathering_level <= max_gathering_level)
-      this.gathering_level = gathering_level;
+         this.gathering_level = gathering_level;
+   }
+
+   public int getGrow_level() {
+      return this.grow_level;
+   }
+
+   public void setGrow_level(int grow_level) {
+      if (grow_level <= max_grow_level)
+         this.grow_level = gathering_level;
    }
 
    abstract class BaseBeeGoal extends Goal {
@@ -788,7 +810,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
       public void start() {
          BlockEntity blockentity = CommonBee.this.level.getBlockEntity(CommonBee.this.hivePos);
          if (blockentity instanceof CommonBeehiveEntity beehiveblockentity) {
-            beehiveblockentity.addOccupant(CommonBee.this, CommonBee.this.hasNectar(), CommonBee.this.gathering_level);
+            beehiveblockentity.addOccupant(CommonBee.this, CommonBee.this.hasNectar(), CommonBee.this.gathering_level, CommonBee.this.grow_level);
          }
 
       }
@@ -972,7 +994,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    }
 
    class BeeGrowCropGoal extends BaseBeeGoal {
-      static final int GROW_CHANCE = 30;
+      final int GROW_CHANCE = CommonBee.this.grow_level == 0 ? 30 : 30 / CommonBee.this.grow_level;
 
       public boolean canBeeUse() {
          if (CommonBee.this.getCropsGrownSincePollination() >= MAX_CROPS_GROWABLE) {
