@@ -314,7 +314,7 @@ public class CommonBeehiveEntity extends BlockEntity {
 
     @Override
    public void saveAdditional(CompoundTag tag) {
-        System.out.print("Saving Common beehive\n");
+        //System.out.print("Saving Common beehive\n");
         tag.put("Bees", this.writeBees());
         tag.putInt("MaxLevel", MaxHoneyLevel);
         tag.putInt("MaxOccupant", MaxOccupants);

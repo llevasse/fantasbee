@@ -1020,10 +1020,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                      ((BonemealableBlock)blockstate.getBlock()).performBonemeal((ServerLevel)CommonBee.this.level, CommonBee.this.random, blockpos, blockstate);
                   }
                   else if (blockstate.is(BlockTags.FLOWERS) || (CommonBee.this.hasSavedFlowerPos() && blockstate.is(Blocks.GRASS_BLOCK))){
-                     int range = 2;
+                     int range = 1;
                      BlockPos.MutableBlockPos mutableblockpos = new BlockPos.MutableBlockPos();
-                     //System.out.printf("beeGrowCropGoal searching for clear grass\n");
-
 
                      int   x = blockpos.getX() - range, y = blockpos.getY() - range, z = blockpos.getZ() - range;
                      for (int checkX = x; checkX <= x + (range * 2) + 1 && !flag; checkX++){
@@ -1034,7 +1032,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                               if (check.isAir() && level.getBlockState(mutableblockpos.below()).is(Blocks.GRASS_BLOCK) && CommonBee.this.hasSavedFlowerPos()) {
 
                                  CommonBee.this.level.setBlockAndUpdate(mutableblockpos, level.getBlockState(CommonBee.this.getSavedFlowerPos()));
-                                 //System.out.printf("beeGrowCropGoal birth flower\n");
                                  CommonBee.this.incrementNumCropsGrownSincePollination();
                                  flag = true;
                               }
