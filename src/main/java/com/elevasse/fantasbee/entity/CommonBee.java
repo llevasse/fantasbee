@@ -1017,6 +1017,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                BlockPos blockpos = CommonBee.this.blockPosition().below(i);
                BlockState blockstate = CommonBee.this.level.getBlockState(blockpos);
                Block block = blockstate.getBlock();
+//               System.out.printf("check %d %d %d : %s\n", blockpos.getX(), blockpos.getY(), blockpos.getZ(), block.getName().getString());
                boolean flag = false;
                IntegerProperty integerproperty = null;
                if (blockstate.is(BlockTags.BEE_GROWABLES)) {
@@ -1042,25 +1043,11 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                      ((BonemealableBlock)blockstate.getBlock()).performBonemeal((ServerLevel)CommonBee.this.level, CommonBee.this.random, blockpos, blockstate);
                   }
                   else if (blockstate.is(BlockTags.FLOWERS) || (CommonBee.this.hasSavedFlowerPos() && blockstate.is(Blocks.GRASS_BLOCK))){
-                     int range = 1;
-                     BlockPos.MutableBlockPos mutableblockpos = new BlockPos.MutableBlockPos();
-
-                     int   x = blockpos.getX() - range, y = blockpos.getY() - range, z = blockpos.getZ() - range;
-                     for (int checkX = x; checkX <= x + (range * 2) + 1 && !flag; checkX++){
-                        for (int checkY = y; checkY <= y + (range * 2) + 1 && !flag; checkY++){
-                           for (int checkZ = z; checkZ <= z + (range * 2) + 1 && !flag; checkZ++){
-                              mutableblockpos.set(checkX,checkY,checkZ);
-                              BlockState check = level.getBlockState(mutableblockpos);
-                              if (check.isAir() && level.getBlockState(mutableblockpos.below()).is(Blocks.GRASS_BLOCK) && CommonBee.this.hasSavedFlowerPos()) {
-
-                                 CommonBee.this.level.setBlockAndUpdate(mutableblockpos, level.getBlockState(CommonBee.this.getSavedFlowerPos()));
-                                 CommonBee.this.incrementNumCropsGrownSincePollination();
-                                 flag = true;
-                              }
-                           }
-                        }
+                     if (level.getBlockState(blockpos.above()).is(Blocks.AIR) && CommonBee.this.hasSavedFlowerPos()) {
+//                        System.out.printf("Birth flower\n");
+                        CommonBee.this.level.setBlockAndUpdate(blockpos.above(), level.getBlockState(CommonBee.this.getSavedFlowerPos()));
+                        CommonBee.this.incrementNumCropsGrownSincePollination();
                      }
-                     flag = false;
                   }
 
                   if (flag) {
