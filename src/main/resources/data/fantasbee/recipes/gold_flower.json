@@ -7,13 +7,13 @@
   ],
   "key": {
     ".": {
-      "item": "minecraft:iron_ingot"
+      "item": "minecraft:gold_ingot"
     },
     "#": {
       "item": "minecraft:poppy"
     }
   },
   "result": {
-    "item": "fantasbee:iron_flower"
+    "item": "fantasbee:gold_flower"
   }
 }
