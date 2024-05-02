@@ -36,6 +36,7 @@ public class CommonBeehiveEntity extends BlockEntity {
     public static final String TICKS_IN_HIVE = "TicksInHive";
     public static final String HAS_NECTAR = "HasNectar";
     public static final String BEES = "Bees";
+    public static final String TAG_FLOWER_BIRTHED = "FlowerBirthedAround";
     private static final List<String> IGNORED_BEE_TAGS = Arrays.asList("Air", "ArmorDropChances", "ArmorItems", "Brain", "CanPickUpLoot", "DeathTime", "FallDistance", "FallFlying", "Fire", "HandDropChances", "HandItems", "HurtByTimestamp", "HurtTime", "LeftHanded", "Motion", "NoGravity", "OnGround", "PortalCooldown", "Pos", "Rotation", "CannotEnterHiveTicks", "TicksSincePollination", "CropsGrownSincePollination", "HivePos", "Passengers", "Leash", "UUID");
     private static final int MIN_TICKS_BEFORE_REENTERING_HIVE = 400;
     private static final int MIN_OCCUPATION_TICKS_NECTAR = 2400;
@@ -45,12 +46,16 @@ public class CommonBeehiveEntity extends BlockEntity {
     private BlockPos savedFlowerPos;
     private int MaxHoneyLevel;
     private int MaxOccupants;
+    private int MaxFlowerBirth;
+    private int flowerBirthedAround;
 
     public CommonBeehiveEntity(BlockPos pos, BlockState state) {
         super(RefBlockEntity.COMMON_BEEHIVE.get(), pos, state);
         currentProduction = Items.AIR.getDefaultInstance();
         MaxHoneyLevel = 5;
         MaxOccupants = 3;
+        MaxFlowerBirth = 5;
+        flowerBirthedAround = 0;
     }
 
     public void setMaxHoneyLevel(int newMax){ MaxHoneyLevel = newMax;}
@@ -58,6 +63,11 @@ public class CommonBeehiveEntity extends BlockEntity {
         currentProduction = item;
     }
 
+    public int getFlowerBirthedAround() { return flowerBirthedAround;}
+    public void setFlowerBirthedAround(int flowerBirthed) { flowerBirthedAround = flowerBirthed;}
+
+    public int getMaxFlowerBirth() { return MaxFlowerBirth;}
+    public void setMaxFlowerBirth(int maxFlowerBirth) { MaxFlowerBirth = maxFlowerBirth;}
 
     public int getMaxHoneyLevel(){ return MaxHoneyLevel;}
     public ItemStack getCurrentProduction( ){ return currentProduction;}
@@ -296,11 +306,13 @@ public class CommonBeehiveEntity extends BlockEntity {
                     compoundtag.getInt(TICKS_IN_HIVE),
                     compoundtag.getInt(MIN_OCCUPATION_TICKS),
                     compoundtag.getInt(CommonBee.TAG_GATHERING_LVL),
-                    compoundtag.getInt(CommonBee.TAG_GROW_LVL));
+                    compoundtag.getInt(CommonBee.TAG_GROW_LVL)
+            );
             this.stored.add(CommonBeehiveEntity$beedata);
         }
         this.MaxHoneyLevel = tag.getInt("MaxLevel");
         this.MaxOccupants = tag.getInt("MaxOccupant");
+        this.flowerBirthedAround = tag.getInt(TAG_FLOWER_BIRTHED);
 
         this.savedFlowerPos = null;
         if (tag.contains(TAG_FLOWER_POS)) {
@@ -314,6 +326,7 @@ public class CommonBeehiveEntity extends BlockEntity {
         tag.put(BEES, this.writeBees());
         tag.putInt("MaxLevel", MaxHoneyLevel);
         tag.putInt("MaxOccupant", MaxOccupants);
+        tag.putInt(TAG_FLOWER_BIRTHED, flowerBirthedAround);
         if (this.hasSavedFlowerPos()) {
             tag.put(TAG_FLOWER_POS, NbtUtils.writeBlockPos(this.savedFlowerPos));
         }

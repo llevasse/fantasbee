@@ -115,6 +115,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    public static final String TAG_HIVE_POS = "HivePos";
    public static final String TAG_GATHERING_LVL = "GatheringLvl";
    public static final String TAG_GROW_LVL = "GrowLvl";
+   public static final String TAG_FLOWER_BIRTHED = "FlowerBirthed";
    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
    @Nullable
    private UUID persistentAngerTarget;
@@ -812,7 +813,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
          if (blockentity instanceof CommonBeehiveEntity beehiveblockentity) {
             beehiveblockentity.addOccupant(CommonBee.this, CommonBee.this.hasNectar(), CommonBee.this.gathering_level, CommonBee.this.grow_level);
          }
-
       }
    }
 
@@ -1042,9 +1042,11 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                   } else if (blockstate.is(Blocks.CAVE_VINES) || blockstate.is(Blocks.CAVE_VINES_PLANT)) {
                      ((BonemealableBlock)blockstate.getBlock()).performBonemeal((ServerLevel)CommonBee.this.level, CommonBee.this.random, blockpos, blockstate);
                   }
-                  else if (blockstate.is(BlockTags.FLOWERS) || (CommonBee.this.hasSavedFlowerPos() && blockstate.is(Blocks.GRASS_BLOCK))){
-                     if (level.getBlockState(blockpos.above()).is(Blocks.AIR) && CommonBee.this.hasSavedFlowerPos()) {
+                  else if ((blockstate.is(BlockTags.FLOWERS) || (CommonBee.this.hasSavedFlowerPos() && blockstate.is(Blocks.GRASS_BLOCK))) && CommonBee.this.hasHive()){
+                     CommonBeehiveEntity hive = (CommonBeehiveEntity) level.getBlockEntity(CommonBee.this.hivePos);
+                     if (hive.getFlowerBirthedAround() < hive.getMaxFlowerBirth() && level.getBlockState(blockpos.above()).is(Blocks.AIR) && CommonBee.this.hasSavedFlowerPos()) {
 //                        System.out.printf("Birth flower\n");
+                        hive.setFlowerBirthedAround(hive.getFlowerBirthedAround() + 1);
                         CommonBee.this.level.setBlockAndUpdate(blockpos.above(), level.getBlockState(CommonBee.this.getSavedFlowerPos()));
                         CommonBee.this.incrementNumCropsGrownSincePollination();
                      }
