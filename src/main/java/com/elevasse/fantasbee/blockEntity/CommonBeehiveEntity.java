@@ -54,14 +54,12 @@ public class CommonBeehiveEntity extends BlockEntity {
     }
 
     public void setMaxHoneyLevel(int newMax){ MaxHoneyLevel = newMax;}
-    public void setMaxOccupants(int newMax){ MaxOccupants = newMax;}
     public void setCurrentProduction( ItemStack item ){
         currentProduction = item;
     }
 
 
     public int getMaxHoneyLevel(){ return MaxHoneyLevel;}
-    public int getMaxOccupants(){ return MaxOccupants;}
     public ItemStack getCurrentProduction( ){ return currentProduction;}
 
     public void setChanged() {
@@ -128,10 +126,6 @@ public class CommonBeehiveEntity extends BlockEntity {
         this.addOccupantWithPresetTicks(commonBee, hasNectar, 0, gathering_level, growLevel);
     }
 
-    public int getOccupantCount() {
-        return this.stored.size();
-    }
-
     public static int getHoneyLevel(BlockState p_58753_) {
         return p_58753_.getValue(CommonBeehive.HONEY_LEVEL);
     }
@@ -169,7 +163,7 @@ public class CommonBeehiveEntity extends BlockEntity {
     }
 
     public void storeBee(CompoundTag tag, int ticksInHive, boolean minTickOccupation, int gatheringLevel, int growLevel) {
-        this.stored.add(new CommonBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 3 : 1, gatheringLevel, growLevel)); //default 2400 : 600
+        this.stored.add(new CommonBeehiveEntity.BeeData(tag, ticksInHive, minTickOccupation ? 3 : 1, gatheringLevel, growLevel)); //default MIN_OCCUPATION_TICKS_NECTAR : MIN_OCCUPATION_TICKS_NECTARLESS
     }
 
     private static boolean releaseOccupant(Level level, BlockPos blockPos, BlockState blockState, CommonBeehiveEntity.BeeData beeData, @Nullable List<Entity> entityList, CommonBeehiveEntity.BeeReleaseStatus p_155142_, @Nullable BlockPos flowerPos) {
@@ -264,7 +258,7 @@ public class CommonBeehiveEntity extends BlockEntity {
             CommonBeehiveEntity$beedata = iterator.next();
             //        System.out.printf("Ticks in hive : %d\n", CommonBeehiveEntity$beedata.ticksInHive);
             if (CommonBeehiveEntity$beedata.ticksInHive > CommonBeehiveEntity$beedata.minOccupationTicks) {
-                CommonBeehiveEntity.BeeReleaseStatus CommonBeehiveEntity$beereleasestatus = CommonBeehiveEntity$beedata.entityData.getBoolean("HasNectar") ? CommonBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED : CommonBeehiveEntity.BeeReleaseStatus.BEE_RELEASED;
+                CommonBeehiveEntity.BeeReleaseStatus CommonBeehiveEntity$beereleasestatus = CommonBeehiveEntity$beedata.entityData.getBoolean(HAS_NECTAR) ? CommonBeehiveEntity.BeeReleaseStatus.HONEY_DELIVERED : CommonBeehiveEntity.BeeReleaseStatus.BEE_RELEASED;
                 if (releaseOccupant(level, blockPos, blockState, CommonBeehiveEntity$beedata, null, CommonBeehiveEntity$beereleasestatus, flowerPos)) {
                     flag = true;
                     iterator.remove();
@@ -293,14 +287,14 @@ public class CommonBeehiveEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         super.load(tag);
         this.stored.clear();
-        ListTag listtag = tag.getList("Bees", 10);
+        ListTag listtag = tag.getList(BEES, 10);
 
         this.currentProduction = ItemStack.of(tag.getCompound("Production"));
         for(int i = 0; i < listtag.size(); ++i) {
             CompoundTag compoundtag = listtag.getCompound(i);
-            CommonBeehiveEntity.BeeData CommonBeehiveEntity$beedata = new CommonBeehiveEntity.BeeData(compoundtag.getCompound("EntityData"),
-                    compoundtag.getInt("TicksInHive"),
-                    compoundtag.getInt("MinOccupationTicks"),
+            CommonBeehiveEntity.BeeData CommonBeehiveEntity$beedata = new CommonBeehiveEntity.BeeData(compoundtag.getCompound(ENTITY_DATA),
+                    compoundtag.getInt(TICKS_IN_HIVE),
+                    compoundtag.getInt(MIN_OCCUPATION_TICKS),
                     compoundtag.getInt(CommonBee.TAG_GATHERING_LVL),
                     compoundtag.getInt(CommonBee.TAG_GROW_LVL));
             this.stored.add(CommonBeehiveEntity$beedata);
@@ -309,19 +303,19 @@ public class CommonBeehiveEntity extends BlockEntity {
         this.MaxOccupants = tag.getInt("MaxOccupant");
 
         this.savedFlowerPos = null;
-        if (tag.contains("FlowerPos")) {
-            this.savedFlowerPos = NbtUtils.readBlockPos(tag.getCompound("FlowerPos"));
+        if (tag.contains(TAG_FLOWER_POS)) {
+            this.savedFlowerPos = NbtUtils.readBlockPos(tag.getCompound(TAG_FLOWER_POS));
         }
     }
 
     @Override
     public void saveAdditional(CompoundTag tag) {
         //System.out.print("Saving Common beehive\n");
-        tag.put("Bees", this.writeBees());
+        tag.put(BEES, this.writeBees());
         tag.putInt("MaxLevel", MaxHoneyLevel);
         tag.putInt("MaxOccupant", MaxOccupants);
         if (this.hasSavedFlowerPos()) {
-            tag.put("FlowerPos", NbtUtils.writeBlockPos(this.savedFlowerPos));
+            tag.put(TAG_FLOWER_POS, NbtUtils.writeBlockPos(this.savedFlowerPos));
         }
         tag.put("Production", this.currentProduction.serializeNBT());
         super.saveAdditional(tag);
@@ -334,9 +328,9 @@ public class CommonBeehiveEntity extends BlockEntity {
             CompoundTag compoundtag = CommonBeehiveEntity$beedata.entityData.copy();
             compoundtag.remove("UUID");
             CompoundTag compoundtag1 = new CompoundTag();
-            compoundtag1.put("EntityData", compoundtag);
-            compoundtag1.putInt("TicksInHive", CommonBeehiveEntity$beedata.ticksInHive);
-            compoundtag1.putInt("MinOccupationTicks", CommonBeehiveEntity$beedata.minOccupationTicks);
+            compoundtag1.put(ENTITY_DATA, compoundtag);
+            compoundtag1.putInt(TICKS_IN_HIVE, CommonBeehiveEntity$beedata.ticksInHive);
+            compoundtag1.putInt(MIN_OCCUPATION_TICKS, CommonBeehiveEntity$beedata.minOccupationTicks);
             compoundtag1.putInt(CommonBee.TAG_GATHERING_LVL, CommonBeehiveEntity$beedata.gatheringLvl);
             compoundtag1.putInt(CommonBee.TAG_GROW_LVL, CommonBeehiveEntity$beedata.growLvl);
             listtag.add(compoundtag1);

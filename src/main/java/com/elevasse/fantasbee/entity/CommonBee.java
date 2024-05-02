@@ -128,7 +128,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
    int remainingCooldownBeforeLocatingNewHive;
    private static final int COOLDOWN_BEFORE_LOCATING_NEW_FLOWER = 200;
    int remainingCooldownBeforeLocatingNewFlower = Mth.nextInt(this.random, 20, 60);
-   @Nullable
+@Nullable
    BlockPos savedFlowerPos;
    @Nullable
    BlockPos hivePos;
