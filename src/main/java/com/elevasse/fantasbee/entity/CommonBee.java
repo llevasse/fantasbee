@@ -164,7 +164,7 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
     }
 
     public CommonBee(ServerLevel level, BlockPos blockPos) {
-        this(level, blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        this(level, blockPos.getX(), blockPos.getY(), blockPos.getZ()); 
     }
 
     @Nullable
@@ -1238,8 +1238,14 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
             BlockState state = CommonBee.this.level.getBlockState(CommonBee.this.savedFlowerPos);
             if (state.is(RefBlocks.COAL_FLOWER.get()))
                CommonBee.this.setFlowerProduction(Items.COAL.getDefaultInstance());
+            else if (state.is(RefBlocks.COPPER_FLOWER.get()))
+               CommonBee.this.setFlowerProduction(Items.COPPER_ORE.getDefaultInstance());
             else if (state.is(RefBlocks.IRON_FLOWER.get()))
                CommonBee.this.setFlowerProduction(Items.IRON_NUGGET.getDefaultInstance());
+            else if (state.is(RefBlocks.GOLD_FLOWER.get()))
+               CommonBee.this.setFlowerProduction(Items.GOLD_NUGGET.getDefaultInstance());
+            else if (state.is(RefBlocks.DIAMOND_FLOWER.get()))
+               CommonBee.this.setFlowerProduction(Items.DIAMOND.getDefaultInstance());
             else
                CommonBee.this.setFlowerProduction(Items.HONEYCOMB.getDefaultInstance());
             CommonBee.this.setHasNectar(true);

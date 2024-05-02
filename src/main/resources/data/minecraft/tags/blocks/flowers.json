@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "fantasbee:iron_flower",
-    "fantasbee:coal_flower"
+    "fantasbee:coal_flower",
+    "fantasbee:copper_flower",
+    "fantasbee:gold_flower",
+    "fantasbee:diamond_flower"
   ]
 }
