@@ -5,5 +5,8 @@
   "block.fantasbee.gold_beehive": "Gold beehive",
   "block.fantasbee.diamond_beehive": "Diamond beehive",
   "block.fantasbee.iron_flower": "Iron flower",
-  "block.fantasbee.coal_flower": "Coal flower"
+  "block.fantasbee.coal_flower": "Coal flower",
+  "block.fantasbee.copper_flower": "Copper flower",
+  "block.fantasbee.gold_flower": "Gold flower",
+  "block.fantasbee.diamond_flower": "Diamond flower"
 }
