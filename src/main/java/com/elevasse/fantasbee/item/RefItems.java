@@ -19,6 +19,7 @@ public class RefItems {
 
     public static final RegistryObject<Item> COPPER_UPGRADE = registerItem("copper_upgrade", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_UPGRADE = registerItem("iron_upgrade", () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> GOLD_UPGRADE = registerItem("gold_upgrade", () -> new Item(new Item.Properties()));
 
     private static <T extends Item> RegistryObject<T> registerItem(String name, Supplier<T> item){
         RegistryObject<T> toReturn = ITEMS.register(name, item);
