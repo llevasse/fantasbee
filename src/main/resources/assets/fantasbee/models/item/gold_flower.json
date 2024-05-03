@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "fantasbee:block/coal_flower"
+    "layer0": "fantasbee:block/gold_flower"
   }
 }
