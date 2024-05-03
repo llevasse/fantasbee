@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " . ",
+    ".#.",
+    " . "
+  ],
+  "key": {
+    ".": {
+      "item": "minecraft:iron_ingot"
+    },
+    "#": {
+      "item": "fantasbee:copper_upgrade"
+    }
+  },
+  "result": {
+    "item": "fantasbee:iron_upgrade"
+  }
+}
