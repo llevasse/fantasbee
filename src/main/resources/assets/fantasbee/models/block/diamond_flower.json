@@ -1,0 +1,7 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "fantasbee:block/diamond_flower"
+  },
+  "render_type": "cutout"
+}
