@@ -73,6 +73,7 @@ public class fantasbee
             event.accept(RefItems.COPPER_UPGRADE);
             event.accept(RefItems.IRON_UPGRADE);
             event.accept(RefItems.GOLD_UPGRADE);
+            event.accept(RefItems.DIAMOND_UPGRADE);
         }
     }
 
