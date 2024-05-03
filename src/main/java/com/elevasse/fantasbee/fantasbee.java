@@ -63,7 +63,7 @@ public class fantasbee
             event.accept(RefBlocks.COMMON_BEEHIVE);
             event.accept(RefBlocks.IRON_FLOWER);
             event.accept(RefBlocks.COAL_FLOWER);
-            event.accept(RefBlocks.COPPER_BEEHIVE);
+            event.accept(RefBlocks.COPPER_FLOWER);
             event.accept(RefBlocks.GOLD_FLOWER);
             event.accept(RefBlocks.DIAMOND_FLOWER);
         }
