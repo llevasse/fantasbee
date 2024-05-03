@@ -65,6 +65,18 @@ public class CommonBeehive extends Block implements EntityBlock {
                         level.setBlockAndUpdate(pos, RefBlocks.COPPER_BEEHIVE.get().defaultBlockState().setValue(CopperBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(CopperBeehive.FACING, blockstate.getValue(FACING)));
                         ((CommonBeehiveEntity) entity).setMaxHoneyLevel(10);
                     }
+                    else if (held.is(RefItems.IRON_UPGRADE.get())){
+                        level.setBlockAndUpdate(pos, RefBlocks.IRON_BEEHIVE.get().defaultBlockState().setValue(IronBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(IronBeehive.FACING, blockstate.getValue(FACING)));
+                        ((CommonBeehiveEntity) entity).setMaxHoneyLevel(15);
+                    }
+                    else if (held.is(RefItems.GOLD_UPGRADE.get())){
+                        level.setBlockAndUpdate(pos, RefBlocks.GOLD_BEEHIVE.get().defaultBlockState().setValue(GoldBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(GoldBeehive.FACING, blockstate.getValue(FACING)));
+                        ((CommonBeehiveEntity) entity).setMaxHoneyLevel(20);
+                    }
+                    else if (held.is(RefItems.DIAMOND_UPGRADE.get())){
+                        level.setBlockAndUpdate(pos, RefBlocks.DIAMOND_BEEHIVE.get().defaultBlockState().setValue(DiamondBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(DiamondBeehive.FACING, blockstate.getValue(FACING)));
+                        ((CommonBeehiveEntity) entity).setMaxHoneyLevel(25);
+                    }
                     else
                         return InteractionResult.FAIL;
                     return InteractionResult.SUCCESS;

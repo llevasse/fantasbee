@@ -65,6 +65,10 @@ public class IronBeehive extends Block implements EntityBlock {
                         level.setBlockAndUpdate(pos, RefBlocks.GOLD_BEEHIVE.get().defaultBlockState().setValue(GoldBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(GoldBeehive.FACING, blockstate.getValue(FACING)));
                         ((CommonBeehiveEntity) entity).setMaxHoneyLevel(20);
                     }
+                    else if (held.is(RefItems.DIAMOND_UPGRADE.get())){
+                        level.setBlockAndUpdate(pos, RefBlocks.DIAMOND_BEEHIVE.get().defaultBlockState().setValue(DiamondBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(DiamondBeehive.FACING, blockstate.getValue(FACING)));
+                        ((CommonBeehiveEntity) entity).setMaxHoneyLevel(25);
+                    }
                     else
                         return InteractionResult.FAIL;
                     return InteractionResult.SUCCESS;
