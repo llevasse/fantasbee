@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " . ",
+    ".#.",
+    " . "
+  ],
+  "key": {
+    ".": {
+      "item": "minecraft:copper_ingot"
+    },
+    "#": {
+      "tag": "fantasbee:beehives"
+    }
+  },
+  "result": {
+    "item": "fantasbee:copper_upgrade"
+  }
+}
