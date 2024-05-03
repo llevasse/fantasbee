@@ -70,6 +70,7 @@ public class fantasbee
             event.accept(RefBlocks.COPPER_FLOWER);
             event.accept(RefBlocks.GOLD_FLOWER);
             event.accept(RefBlocks.DIAMOND_FLOWER);
+            event.accept(RefItems.COPPER_UPGRADE);
         }
     }
 
