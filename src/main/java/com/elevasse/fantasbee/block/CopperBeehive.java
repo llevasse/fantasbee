@@ -2,6 +2,7 @@ package com.elevasse.fantasbee.block;
 
 import com.elevasse.fantasbee.blockEntity.CommonBeehiveEntity;
 import com.elevasse.fantasbee.blockEntity.RefBlockEntity;
+import com.elevasse.fantasbee.item.RefItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -60,7 +61,7 @@ public class CopperBeehive extends Block implements EntityBlock {
                             level.setBlockAndUpdate(pos, blockstate.setValue(CopperBeehive.HONEY_LEVEL, hLvl));
                         }
                     }
-                    else if (held.is(Items.IRON_INGOT)){
+                    else if (held.is(RefItems.IRON_UPGRADE.get())){
                         level.setBlockAndUpdate(pos, RefBlocks.IRON_BEEHIVE.get().defaultBlockState().setValue(IronBeehive.HONEY_LEVEL, blockstate.getValue(HONEY_LEVEL)).setValue(IronBeehive.FACING, blockstate.getValue(FACING)));
                         ((CommonBeehiveEntity) entity).setMaxHoneyLevel(15);
                     }
