@@ -8,5 +8,12 @@
   "block.fantasbee.coal_flower": "Coal flower",
   "block.fantasbee.copper_flower": "Copper flower",
   "block.fantasbee.gold_flower": "Gold flower",
-  "block.fantasbee.diamond_flower": "Diamond flower"
+  "block.fantasbee.diamond_flower": "Diamond flower",
+  "block.fantasbee.oak_flower": "Oak flower",
+  "block.fantasbee.dark_oak_flower": "Dark oak flower",
+  "block.fantasbee.spruce_flower": "Spruce flower",
+  "block.fantasbee.birch_flower": "Birch flower",
+  "block.fantasbee.jungle_flower": "Jungle flower",
+  "block.fantasbee.acacia_flower": "Acacia flower",
+  "block.fantasbee.cherry_flower": "Cherry flower"
 }
