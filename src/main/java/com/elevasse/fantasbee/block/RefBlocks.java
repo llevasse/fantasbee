@@ -32,11 +32,21 @@ public class RefBlocks {
     public static final RegistryObject<Block> GOLD_BEEHIVE = registerBlock("gold_beehive", () -> new GoldBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
     public static final RegistryObject<Block> DIAMOND_BEEHIVE = registerBlock("diamond_beehive", () -> new DiamondBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
 
+    //ores
     public static final RegistryObject<Block> IRON_FLOWER = registerBlock("iron_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
     public static final RegistryObject<Block> COAL_FLOWER = registerBlock("coal_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
     public static final RegistryObject<Block> COPPER_FLOWER = registerBlock("copper_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
     public static final RegistryObject<Block> GOLD_FLOWER = registerBlock("gold_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
     public static final RegistryObject<Block> DIAMOND_FLOWER = registerBlock("diamond_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+
+    //woods
+    public static final RegistryObject<Block> OAK_FLOWER = registerBlock("oak_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+    public static final RegistryObject<Block> SPRUCE_FLOWER = registerBlock("spruce_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+    public static final RegistryObject<Block> BIRCH_FLOWER = registerBlock("birch_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+    public static final RegistryObject<Block> JUNGLE_FLOWER = registerBlock("jungle_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+    public static final RegistryObject<Block> DARK_OAK_FLOWER = registerBlock("dark_oak_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+    public static final RegistryObject<Block> ACACIA_FLOWER = registerBlock("acacia_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+    public static final RegistryObject<Block> CHERRY_FLOWER = registerBlock("cherry_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
 
 
 

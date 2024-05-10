@@ -65,11 +65,21 @@ public class fantasbee
             event.accept(RefBlocks.IRON_BEEHIVE);
             event.accept(RefBlocks.GOLD_BEEHIVE);
             event.accept(RefBlocks.DIAMOND_BEEHIVE);
+
             event.accept(RefBlocks.IRON_FLOWER);
             event.accept(RefBlocks.COAL_FLOWER);
             event.accept(RefBlocks.COPPER_FLOWER);
             event.accept(RefBlocks.GOLD_FLOWER);
             event.accept(RefBlocks.DIAMOND_FLOWER);
+
+            event.accept(RefBlocks.OAK_FLOWER);
+            event.accept(RefBlocks.DARK_OAK_FLOWER);
+            event.accept(RefBlocks.SPRUCE_FLOWER);
+            event.accept(RefBlocks.BIRCH_FLOWER);
+            event.accept(RefBlocks.JUNGLE_FLOWER);
+            event.accept(RefBlocks.ACACIA_FLOWER);
+            event.accept(RefBlocks.CHERRY_FLOWER);
+
             event.accept(RefItems.COPPER_UPGRADE);
             event.accept(RefItems.IRON_UPGRADE);
             event.accept(RefItems.GOLD_UPGRADE);
