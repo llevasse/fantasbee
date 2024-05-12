@@ -1250,8 +1250,6 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                CommonBee.this.setFlowerProduction(Items.DIAMOND.getDefaultInstance());
             else if (state.is(RefBlocks.OAK_FLOWER.get()))
                CommonBee.this.setFlowerProduction(Items.OAK_PLANKS.getDefaultInstance());
-            else if (state.is(RefBlocks.DARK_OAK_FLOWER.get()))
-               CommonBee.this.setFlowerProduction(Items.DARK_OAK_PLANKS.getDefaultInstance());
             else if (state.is(RefBlocks.SPRUCE_FLOWER.get()))
                CommonBee.this.setFlowerProduction(Items.SPRUCE_PLANKS.getDefaultInstance());
             else if (state.is(RefBlocks.BIRCH_FLOWER.get()))
@@ -1260,8 +1258,8 @@ public class CommonBee extends Animal implements NeutralMob, FlyingAnimal {
                CommonBee.this.setFlowerProduction(Items.JUNGLE_PLANKS.getDefaultInstance());
             else if (state.is(RefBlocks.ACACIA_FLOWER.get()))
                CommonBee.this.setFlowerProduction(Items.ACACIA_PLANKS.getDefaultInstance());
-            else if (state.is(RefBlocks.CHERRY_FLOWER.get()))
-               CommonBee.this.setFlowerProduction(Items.CHERRY_PLANKS.getDefaultInstance());
+            else if (state.is(RefBlocks.DARK_OAK_FLOWER.get()))
+               CommonBee.this.setFlowerProduction(Items.DARK_OAK_PLANKS.getDefaultInstance());
             else
                CommonBee.this.setFlowerProduction(Items.HONEYCOMB.getDefaultInstance());
             CommonBee.this.setHasNectar(true);

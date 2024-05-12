@@ -73,12 +73,11 @@ public class fantasbee
             event.accept(RefBlocks.DIAMOND_FLOWER);
 
             event.accept(RefBlocks.OAK_FLOWER);
-            event.accept(RefBlocks.DARK_OAK_FLOWER);
             event.accept(RefBlocks.SPRUCE_FLOWER);
             event.accept(RefBlocks.BIRCH_FLOWER);
             event.accept(RefBlocks.JUNGLE_FLOWER);
             event.accept(RefBlocks.ACACIA_FLOWER);
-            event.accept(RefBlocks.CHERRY_FLOWER);
+            event.accept(RefBlocks.DARK_OAK_FLOWER);
 
             event.accept(RefItems.COPPER_UPGRADE);
             event.accept(RefItems.IRON_UPGRADE);
