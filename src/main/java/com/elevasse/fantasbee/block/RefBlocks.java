@@ -2,6 +2,7 @@ package com.elevasse.fantasbee.block;
 
 import com.elevasse.fantasbee.fantasbee;
 import com.elevasse.fantasbee.item.RefItems;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.BlockItem;
@@ -33,11 +34,11 @@ public class RefBlocks {
     public static final RegistryObject<Block> DIAMOND_BEEHIVE = registerBlock("diamond_beehive", () -> new DiamondBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
 
     //ores
-    public static final RegistryObject<Block> IRON_FLOWER = registerBlock("iron_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
-    public static final RegistryObject<Block> COAL_FLOWER = registerBlock("coal_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
-    public static final RegistryObject<Block> COPPER_FLOWER = registerBlock("copper_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
-    public static final RegistryObject<Block> GOLD_FLOWER = registerBlock("gold_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
-    public static final RegistryObject<Block> DIAMOND_FLOWER = registerBlock("diamond_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+    public static final RegistryObject<Block> IRON_FLOWER = registerBlock("iron_flower", () -> new OreFlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION), BlockTags.IRON_ORES));
+    public static final RegistryObject<Block> COAL_FLOWER = registerBlock("coal_flower", () -> new OreFlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION), BlockTags.COAL_ORES));
+    public static final RegistryObject<Block> COPPER_FLOWER = registerBlock("copper_flower", () -> new OreFlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION), BlockTags.COPPER_ORES));
+    public static final RegistryObject<Block> GOLD_FLOWER = registerBlock("gold_flower", () -> new OreFlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION), BlockTags.GOLD_ORES));
+    public static final RegistryObject<Block> DIAMOND_FLOWER = registerBlock("diamond_flower", () -> new OreFlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION), BlockTags.DIAMOND_ORES));
 
     //woods
     public static final RegistryObject<Block> OAK_FLOWER = registerBlock("oak_flower", () -> new FlowerBlock(MobEffects.POISON, 10, BlockBehaviour.Properties.copy(Blocks.DANDELION)));
