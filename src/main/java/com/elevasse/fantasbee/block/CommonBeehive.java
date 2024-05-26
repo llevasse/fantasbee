@@ -12,13 +12,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -27,17 +27,25 @@ import org.jetbrains.annotations.Nullable;
 
 public class CommonBeehive extends Block implements EntityBlock {
     public static final IntegerProperty HONEY_LEVEL = IntegerProperty.create("honey_level", 0, 5);
-    public static Property<Direction> FACING = DirectionProperty.create("facing");
+    public static final DirectionProperty FACING;
+    //public static Property<Direction> FACING = DirectionProperty.create("facing");
 
     public CommonBeehive(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(HONEY_LEVEL, 0));
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+        this.registerDefaultState((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue(HONEY_LEVEL, 0)).setValue(FACING, Direction.NORTH));
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+    }
+
+    public BlockState rotate(BlockState blockState, Rotation rotation) {
+        return (BlockState)blockState.setValue(FACING, rotation.rotate((Direction)blockState.getValue(FACING)));
+    }
+
+    public BlockState mirror(BlockState blockState, Mirror mirror) {
+        return blockState.rotate(mirror.getRotation((Direction)blockState.getValue(FACING)));
     }
 
     @Override
@@ -94,13 +102,15 @@ public class CommonBeehive extends Block implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> blockStateBuilder) {
-        blockStateBuilder.add(HONEY_LEVEL);
-        blockStateBuilder.add(FACING);
+        blockStateBuilder.add(new Property[]{HONEY_LEVEL, FACING});
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return type == RefBlockEntity.COMMON_BEEHIVE.get() ? CommonBeehiveEntity::serverTick : null;
+    }
+    static {
+        FACING = HorizontalDirectionalBlock.FACING;
     }
 }
