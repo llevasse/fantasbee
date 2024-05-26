@@ -29,6 +29,7 @@ public class RefBlocks {
 
 
     public static final RegistryObject<Block> COMMON_BEEHIVE = registerVanillaBlock("beehive", () -> new CommonBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
+    public static final RegistryObject<Block> BEE_NEST = registerVanillaBlock("bee_nest", () -> new CommonBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
     public static final RegistryObject<Block> COPPER_BEEHIVE = registerBlock("copper_beehive", () -> new CopperBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
     public static final RegistryObject<Block> IRON_BEEHIVE = registerBlock("iron_beehive", () -> new IronBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));
     public static final RegistryObject<Block> GOLD_BEEHIVE = registerBlock("gold_beehive", () -> new GoldBeehive(BlockBehaviour.Properties.of(Material.WOOD).strength(6f)));

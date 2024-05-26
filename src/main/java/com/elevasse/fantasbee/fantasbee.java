@@ -61,6 +61,7 @@ public class fantasbee
     {
         if (event.getTab() == CreativeModeTabs.SEARCH || event.getTab() == CreativeModeTabs.NATURAL_BLOCKS) {
             event.accept(RefBlocks.COMMON_BEEHIVE);
+            //event.accept(RefBlocks.BEE_NEST);
             event.accept(RefBlocks.COPPER_BEEHIVE);
             event.accept(RefBlocks.IRON_BEEHIVE);
             event.accept(RefBlocks.GOLD_BEEHIVE);
